@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SkillSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #1e293b;
+        }
+
+        header {
+            background: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .logout {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        main {
+            max-width: 1150px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 35px;
+            border-radius: 18px;
+            margin-bottom: 30px;
+        }
+
+        .welcome h1 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 25px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .feature-card button,
+        .action-button {
+            background: #eef2ff;
+            color: #4338ca;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-weight: bold;
+        }
+
+        .content-section {
+    display: none;
+    margin-top: 30px;
+    background: white;
+    padding: 25px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+}
+
+/* Keep Skill Credits visible on the dashboard */
+#creditsSection {
+    display: block;
+}
+        .content-section > p {
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .profile {
+            margin-top: 30px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 25px;
+            border-radius: 14px;
+        }
+
+        .profile p {
+            margin-top: 12px;
+            color: #475569;
+        }
+
+        .form-control {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            max-width: 100%;
+            width: 320px;
+            margin-top: 7px;
+        }
+
+        .action-button {
+            background: #4f46e5;
+            color: white;
+            margin-top: 10px;
+        }
+
+        .skill-list {
+            margin: 15px 0 0 25px;
+        }
+
+        .skill-list li {
+            margin-bottom: 10px;
+        }
+
+        .request-card,
+        .match-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            padding: 18px;
+            margin: 15px 0;
+            border-radius: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .request-card h3,
+        .match-card h3 {
+            margin-bottom: 12px;
+            color: #4338ca;
+        }
+
+        .request-card p,
+        .match-card p {
+            margin: 8px 0;
+        }
+
+        .status {
+            font-weight: bold;
+        }
+
+        .request-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .request-actions button {
+            border: none;
+            border-radius: 7px;
+            padding: 9px 14px;
+            background: #eef2ff;
+            color: #4338ca;
+            font-weight: bold;
+        }
+
+        .request-actions button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            padding: 30px 15px;
+        }
+
+        @media (max-width: 750px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome {
+                padding: 25px;
+            }
+
+            .welcome h1 {
+                font-size: 25px;
+            }
+
+            .content-section {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillSync</div>
+    <button class="logout" id="logoutButton">Log Out</button>
+</header>
+
+<main>
+
+    <section class="welcome">
+        <h1 id="welcomeHeading">Welcome to SkillSync!</h1>
+        <p>
+            Learn something new. Share what you know.
+            Connect with students and grow your skills together.
+        </p>
+    </section>
+    
+    <!-- Skill Credits -->
+    <section class="content-section"
+             id="creditsSection"
+             style="margin-bottom: 25px;">
+
+        <h2 class="section-title">🎓 Your Skill Credits</h2>
+
+        <p id="creditsBalance"
+           style="font-size: 28px; font-weight: bold;">
+            Loading...
+        </p>
+
+        <p id="creditsMessage">
+            Use your credits to learn new skills and earn credits by teaching others.
+        </p>
+
+    </section>
+
+
+        <!-- Notifications -->
+    <section class="content-section" id="notificationsSection"
+             style="display:block; margin-bottom:25px;">
+
+        <h2 class="section-title">🔔 Notifications</h2>
+
+        <p id="notificationMessage" aria-live="polite">
+            Loading notifications...
+        </p>
+
+        <div id="notificationsList"></div>
+
+        <button
+            type="button"
+            id="refreshNotificationsButton"
+            class="action-button">
+            Refresh Notifications
+        </button>
+
+    </section>
+
+    <h2 class="section-title">Your Learning Space</h2>
+
+    <section class="feature-grid">
+
+        <article class="feature-card">
+            <div class="feature-icon">🧠</div>
+            <h3>Skills I Can Teach</h3>
+            <p>Add skills you know and help other students learn from you.</p>
+            <button type="button" id="manageSkillsButton">
+                Manage My Skills
+            </button>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3>Skills I Want to Learn</h3>
+            <p>Choose skills you want to develop with help from other students.</p>
+            <button type="button" data-feature="learn">
+                Explore Learning
+            </button>
+        </article>
+
+        <article class="feature-card">
+            <div class="feature-icon">🤝</div>
+            <h3>Skill Exchange</h3>
+            <p>Find students who can teach you and exchange knowledge.</p>
+            <button type="button" data-feature="exchange">
+                Find Students
+            </button>
+        </article>
+
+    </section>
+
+    <!-- Skills I Can Teach -->
+    <section id="manageSkillsSection" class="content-section">
+
+        <h2 class="section-title">Skills I Can Teach 🎯</h2>
+        <p>Add the skills you can teach to other students.</p>
+
+        <form id="addSkillForm">
+
+            <label for="skillSelect">Choose a Skill:</label><br>
+            <select id="skillSelect" class="form-control" required>
+                <option value="">Loading skills...</option>
+            </select>
+
+            <br><br>
+
+            <div id="customSkillContainer" style="display:none;">
+                <label for="customSkillInput">Enter Your Custom Skill:</label><br>
+                <input
+                    type="text"
+                    id="customSkillInput"
+                    class="form-control"
+                    placeholder="e.g., UI/UX Design"
+                    maxlength="100"
+                >
+            </div>
+
+            <br>
+
+            <label for="proficiencySelect">Your Proficiency:</label><br>
+            <select id="proficiencySelect" class="form-control" required>
+                <option value="">Select proficiency</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+            </select>
+
+            <br><br>
+
+            <button type="submit" class="action-button">Add Skill</button>
+
+        </form>
+
+        <p id="skillMessage" class="message" aria-live="polite"></p>
+
+        <h3 style="margin-top:25px;">My Teaching Skills</h3>
+        <ul id="mySkillsList" class="skill-list">
+            <li>Open this section to load your skills.</li>
+        </ul>
+
+    </section>
+
+    <!-- Skills I Want to Learn -->
+    <section id="learnSkillsSection" class="content-section">
+
+        <h2 class="section-title">Skills I Want to Learn 📚</h2>
+        <p>Choose skills you want to learn from other students.</p>
+
+        <form id="addWantedSkillForm">
+
+            <label for="wantedSkillSelect">Choose a Skill:</label><br>
+            <select id="wantedSkillSelect" class="form-control" required>
+                <option value="">Loading skills...</option>
+            </select>
+
+            <br><br>
+
+            <div id="customWantedSkillContainer" style="display:none;">
+                <label for="customWantedSkillInput">Enter Your Custom Skill:</label><br>
+                <input
+                    type="text"
+                    id="customWantedSkillInput"
+                    class="form-control"
+                    placeholder="e.g., UI/UX Design"
+                    maxlength="100"
+                >
+            </div>
+
+            <br>
+
+            <button type="submit" class="action-button">
+                Add Learning Skill
+            </button>
+
+            <p id="wantedSkillMessage" class="message" aria-live="polite"></p>
+
+        </form>
+
+        <h3 style="margin-top:20px;">My Learning Skills</h3>
+
+        <ul id="wantedSkillsList" class="skill-list">
+            <li>Open this section to load your learning skills.</li>
+        </ul>
+
+    </section>
+
+    <!-- Skill Exchange -->
+    <section id="exchangeSection" class="content-section">
+
+        <h2 class="section-title">Find Your Skill Partner 🤝</h2>
+        <p>Find students who can teach the skills you want to learn.</p>
+
+        <button type="button" id="findMatchesButton" class="action-button">
+            Find Matching Students
+        </button>
+
+        <p id="matchMessage" class="message" aria-live="polite"></p>
+
+        <div id="matchesList" style="margin-top:20px;">
+            <p>Click the button above to find students.</p>
+        </div>
+
+        <hr style="margin:30px 0; border:0; border-top:1px solid #e2e8f0;">
+
+        <!-- Incoming Requests -->
+        <h2 class="section-title">Incoming Exchange Requests 📩</h2>
+        <p>See students who want to learn skills from you.</p>
+
+        <button
+            type="button"
+            id="loadIncomingRequestsButton"
+            class="action-button"
+        >
+            View Incoming Requests
+        </button>
+
+        <p id="incomingRequestsMessage" class="message" aria-live="polite"></p>
+
+        <div id="incomingRequestsList">
+            <p>Click the button above to view incoming requests.</p>
+        </div>
+
+        <hr style="margin:30px 0; border:0; border-top:1px solid #e2e8f0;">
+
+        <!-- Sent Requests: only ONE copy -->
+        <h2 class="section-title">My Sent Requests 📤</h2>
+        <p>Track the exchange requests you have sent to other students.</p>
+
+        <button
+            type="button"
+            id="loadSentRequestsButton"
+            class="action-button"
+        >
+            View Sent Requests
+        </button>
+
+        <p id="sentRequestsMessage" class="message" aria-live="polite"></p>
+
+        <div id="sentRequestsList">
+            <p>Click the button above to view your sent requests.</p>
+        </div>
+
+    </section>
+
+    <!-- My Profile -->
+    <section class="profile">
+        <h2>My Profile</h2>
+        <p><strong>Name:</strong> <span id="studentName">Loading...</span></p>
+        <p><strong>Email:</strong> <span id="studentEmail">Loading...</span></p>
+        <p><strong>Department:</strong> <span id="studentDepartment">Loading...</span></p>
+    </section>
+    <!-- Accepted Skill Exchange Contacts -->
+<section class="content-section"
+         id="acceptedContactsSection"
+         style="display:block;">
+
+    <h2 class="section-title">🤝 My Learning Partners</h2>
+
+    <p>
+        Connect with students whose skill exchange requests
+        have been accepted.
+    </p>
+
+    <p id="contactsMessage" aria-live="polite">
+        Loading learning partners...
+    </p>
+
+    <div id="acceptedContactsList"></div>
+
+    <button
+        type="button"
+        id="refreshContactsButton"
+        class="action-button">
+        Refresh Contacts
+    </button>
+
+</section>
+
+</main>
+
+<footer>
+    SkillSync — Share Skills, Grow Together.
+</footer>
+
+<script>
+"use strict";
+
+// -------------------------------------
+// 1. Logged-in student and profile
+// -------------------------------------
+
+const studentData = sessionStorage.getItem("skillsyncStudent");
+let currentStudent = null;
+
+if (!studentData) {
+    window.location.href = "login.html";
+} else {
+    try {
+        currentStudent = JSON.parse(studentData);
+
+        if (!currentStudent || !currentStudent.studentId) {
+            throw new Error("Invalid student session.");
+        }
+
+        document.getElementById("welcomeHeading").textContent =
+            `Welcome, ${currentStudent.fullName}!`;
+
+        document.getElementById("studentName").textContent =
+            currentStudent.fullName || "Not specified";
+
+        document.getElementById("studentEmail").textContent =
+            currentStudent.email || "Not specified";
+
+        document.getElementById("studentDepartment").textContent =
+            currentStudent.department || "Not specified";
+
+    } catch (error) {
+        sessionStorage.removeItem("skillsyncStudent");
+        window.location.href = "login.html";
+    }
+}
+
+const studentId = currentStudent ? currentStudent.studentId : null;
+// -------------------------------------
+// Notifications for both students
+// -------------------------------------
+
+async function loadNotifications() {
+    const message = document.getElementById("notificationMessage");
+    const list = document.getElementById("notificationsList");
+
+    if (!studentId) {
+        message.textContent = "Please log in to view notifications.";
+        return;
+    }
+
+    message.textContent = "Loading notifications...";
+    list.innerHTML = "";
+
+    try {
+        const response = await fetch(
+            `/api/notifications?studentId=${studentId}`
+        );
+
+        const notifications = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                notifications.message || "Unable to load notifications."
+            );
+        }
+
+        if (!Array.isArray(notifications) || notifications.length === 0) {
+            message.textContent = "You're all caught up! No notifications yet.";
+            return;
+        }
+
+        message.textContent =
+            `You have ${notifications.length} notification(s).`;
+
+        notifications.forEach(notification => {
+            const card = document.createElement("div");
+            card.className = "request-card";
+
+            const heading = document.createElement("h3");
+            const details = document.createElement("p");
+            const status = document.createElement("p");
+
+            const name = notification.other_student_name || "Another student";
+            const skill = notification.skill_name || "a skill";
+
+            if (notification.notification_type === "Incoming") {
+                heading.textContent = "📩 New Exchange Request";
+                details.textContent =
+                    `${name} wants to learn ${skill} from you.`;
+            } else if (notification.status === "Accepted") {
+                heading.textContent = "✅ Request Accepted!";
+                details.textContent =
+                    `${name} accepted your request to learn ${skill}.`;
+            } else if (notification.status === "Rejected") {
+                heading.textContent = "❌ Request Declined";
+                details.textContent =
+                    `${name} declined your request to learn ${skill}.`;
+            } else {
+                return;
+            }
+
+            status.className = "status";
+            status.textContent = `Status: ${notification.status}`;
+
+            card.append(heading, details, status);
+            list.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Notification error:", error);
+        message.textContent =
+            "Unable to load notifications. Please try again.";
+    }
+}
+
+// Refresh notifications when the button is clicked
+document
+    .getElementById("refreshNotificationsButton")
+    .addEventListener("click", loadNotifications);
+
+// Load notifications automatically when the dashboard opens
+loadNotifications();
+// -------------------------------------
+// 2. Logout
+// -------------------------------------
+
+document.getElementById("logoutButton").addEventListener("click", () => {
+    sessionStorage.removeItem("skillsyncStudent");
+    window.location.href = "login.html";
+});
+
+// -------------------------------------
+// 3. Switch between dashboard sections
+// -------------------------------------
+
+const manageSection = document.getElementById("manageSkillsSection");
+const learnSection = document.getElementById("learnSkillsSection");
+const exchangeSection = document.getElementById("exchangeSection");
+
+function hideAllSections() {
+    manageSection.style.display = "none";
+    learnSection.style.display = "none";
+    exchangeSection.style.display = "none";
+}
+
+document.querySelectorAll("[data-feature]").forEach(button => {
+    button.addEventListener("click", async () => {
+        hideAllSections();
+
+        const feature = button.dataset.feature;
+
+        if (feature === "learn") {
+            learnSection.style.display = "block";
+            await loadAvailableWantedSkills();
+            await loadWantedSkills();
+        }
+
+        if (feature === "exchange") {
+            exchangeSection.style.display = "block";
+        }
+    });
+});
+
+document.getElementById("manageSkillsButton").addEventListener("click", async () => {
+    const wasHidden = manageSection.style.display === "none";
+
+    hideAllSections();
+
+    if (wasHidden) {
+        manageSection.style.display = "block";
+        await loadAvailableSkills();
+        await loadMySkills();
+    }
+});
+
+// -------------------------------------
+// 4. Common helper to load skills
+// -------------------------------------
+
+async function populateSkillDropdown(selectId) {
+    const select = document.getElementById(selectId);
+
+    try {
+        const response = await fetch("/api/skills");
+        const skills = await response.json();
+
+        if (!response.ok) {
+            throw new Error(skills.message || "Failed to load skills.");
+        }
+
+        select.innerHTML = '<option value="">Select a skill</option>';
+
+        skills.forEach(skill => {
+            const option = document.createElement("option");
+            option.value = skill.skill_id;
+            option.textContent = skill.skill_name;
+            select.appendChild(option);
+        });
+
+        const customOption = document.createElement("option");
+        customOption.value = "custom";
+        customOption.textContent = "➕ Add a Custom Skill";
+        select.appendChild(customOption);
+
+    } catch (error) {
+        console.error("Error loading skills:", error);
+        select.innerHTML = '<option value="">Unable to load skills</option>';
+    }
+}
+
+async function loadAvailableSkills() {
+    await populateSkillDropdown("skillSelect");
+}
+
+async function loadAvailableWantedSkills() {
+    await populateSkillDropdown("wantedSkillSelect");
+}
+
+// -------------------------------------
+// 5. Custom skill fields
+// -------------------------------------
+
+const skillSelect = document.getElementById("skillSelect");
+const customSkillContainer = document.getElementById("customSkillContainer");
+const customSkillInput = document.getElementById("customSkillInput");
+
+skillSelect.addEventListener("change", () => {
+    const isCustom = skillSelect.value === "custom";
+    customSkillContainer.style.display = isCustom ? "block" : "none";
+    customSkillInput.required = isCustom;
+
+    if (!isCustom) customSkillInput.value = "";
+});
+
+const wantedSkillSelect = document.getElementById("wantedSkillSelect");
+const customWantedSkillContainer =
+    document.getElementById("customWantedSkillContainer");
+const customWantedSkillInput =
+    document.getElementById("customWantedSkillInput");
+
+wantedSkillSelect.addEventListener("change", () => {
+    const isCustom = wantedSkillSelect.value === "custom";
+    customWantedSkillContainer.style.display = isCustom ? "block" : "none";
+    customWantedSkillInput.required = isCustom;
+
+    if (!isCustom) customWantedSkillInput.value = "";
+});
+
+// -------------------------------------
+// 6. Load teaching skills
+// -------------------------------------
+
+async function loadMySkills() {
+    const list = document.getElementById("mySkillsList");
+    list.innerHTML = "<li>Loading your skills...</li>";
+
+    try {
+        const response = await fetch(`/api/my-skills?studentId=${studentId}`);
+        const skills = await response.json();
+
+        if (!response.ok) {
+            throw new Error(skills.message || "Failed to load your skills.");
+        }
+
+        list.innerHTML = "";
+
+        if (skills.length === 0) {
+            list.innerHTML = "<li>You haven't added any teaching skills yet.</li>";
+            return;
+        }
+
+        skills.forEach(skill => {
+            const item = document.createElement("li");
+            item.textContent =
+                `${skill.skill_name} — ${skill.proficiency_level}`;
+            list.appendChild(item);
+        });
+
+    } catch (error) {
+        console.error("Error loading teaching skills:", error);
+        list.innerHTML = "<li>Unable to load your skills.</li>";
+    }
+}
+
+// -------------------------------------
+// 7. Add a teaching skill
+// -------------------------------------
+
+document.getElementById("addSkillForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const selectedSkill = skillSelect.value;
+    const customSkill = customSkillInput.value.trim();
+    const proficiency = document.getElementById("proficiencySelect").value;
+    const message = document.getElementById("skillMessage");
+
+    if (!selectedSkill) {
+        message.textContent = "Please select a skill.";
+        return;
+    }
+
+    if (selectedSkill === "custom" && !customSkill) {
+        message.textContent = "Please enter your custom skill.";
+        return;
+    }
+
+    message.textContent = "Saving your skill...";
+
+    try {
+        const response = await fetch("/api/my-skills", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                studentId,
+                skillId: selectedSkill === "custom" ? null : selectedSkill,
+                customSkill: selectedSkill === "custom" ? customSkill : null,
+                proficiency
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Unable to add the skill.");
+        }
+
+        message.textContent = result.message || "Skill added successfully.";
+
+        document.getElementById("addSkillForm").reset();
+        customSkillContainer.style.display = "none";
+        customSkillInput.required = false;
+
+        await loadAvailableSkills();
+        await loadMySkills();
+
+    } catch (error) {
+        message.textContent = error.message;
+    }
+});
+
+// -------------------------------------
+// 8. Load wanted skills
+// -------------------------------------
+
+async function loadWantedSkills() {
+    const list = document.getElementById("wantedSkillsList");
+    list.innerHTML = "<li>Loading your learning skills...</li>";
+
+    try {
+        const response = await fetch(`/api/wanted-skills?studentId=${studentId}`);
+        const skills = await response.json();
+
+        if (!response.ok) {
+            throw new Error(skills.message || "Failed to load learning skills.");
+        }
+
+        list.innerHTML = "";
+
+        if (skills.length === 0) {
+            list.innerHTML = "<li>You haven't added any learning skills yet.</li>";
+            return;
+        }
+
+        skills.forEach(skill => {
+            const item = document.createElement("li");
+            item.textContent = skill.skill_name;
+            list.appendChild(item);
+        });
+
+    } catch (error) {
+        console.error("Error loading learning skills:", error);
+        list.innerHTML = "<li>Unable to load your learning skills.</li>";
+    }
+}
+
+// -------------------------------------
+// 9. Add a wanted skill
+// -------------------------------------
+
+document.getElementById("addWantedSkillForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const selectedSkill = wantedSkillSelect.value;
+    const customSkill = customWantedSkillInput.value.trim();
+    const message = document.getElementById("wantedSkillMessage");
+
+    if (!selectedSkill) {
+        message.textContent = "Please select a skill.";
+        return;
+    }
+
+    if (selectedSkill === "custom" && !customSkill) {
+        message.textContent = "Please enter your custom skill.";
+        return;
+    }
+
+    message.textContent = "Saving your learning skill...";
+
+    try {
+        const response = await fetch("/api/wanted-skills", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                studentId,
+                skillId: selectedSkill === "custom" ? null : selectedSkill,
+                customSkill: selectedSkill === "custom" ? customSkill : null
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Unable to save your learning skill.");
+        }
+
+        message.textContent = result.message || "Learning skill added successfully.";
+
+        document.getElementById("addWantedSkillForm").reset();
+        customWantedSkillContainer.style.display = "none";
+        customWantedSkillInput.required = false;
+
+        await loadAvailableWantedSkills();
+        await loadWantedSkills();
+
+    } catch (error) {
+        message.textContent = error.message;
+    }
+});
+
+// -------------------------------------
+// 10. Find matching students
+// -------------------------------------
+
+document.getElementById("findMatchesButton").addEventListener("click", async () => {
+    const message = document.getElementById("matchMessage");
+    const matchesList = document.getElementById("matchesList");
+
+    message.textContent = "Searching for matching students...";
+    matchesList.innerHTML = "";
+
+    try {
+        const response = await fetch(`/api/skill-matches?studentId=${studentId}`);
+        const matches = await response.json();
+
+        if (!response.ok) {
+            throw new Error(matches.message || "Unable to find matches.");
+        }
+
+        if (matches.length === 0) {
+            message.textContent =
+                "No matching students found yet. Make sure you've added skills you want to learn.";
+            return;
+        }
+
+        message.textContent = `Found ${matches.length} matching result(s)!`;
+
+        matches.forEach(student => {
+            const card = document.createElement("div");
+            card.className = "match-card";
+
+            const name = document.createElement("h3");
+            name.textContent = student.full_name;
+
+            const department = document.createElement("p");
+            department.textContent =
+                `Department: ${student.department || "Not specified"}`;
+
+            const skill = document.createElement("p");
+            skill.textContent = `Can teach: ${student.skill_name}`;
+
+            const proficiency = document.createElement("p");
+            proficiency.textContent =
+                `Proficiency: ${student.proficiency_level}`;
+
+            const sendButton = document.createElement("button");
+            sendButton.type = "button";
+            sendButton.className = "action-button";
+            sendButton.textContent = "Send Exchange Request";
+
+            sendButton.addEventListener("click", async () => {
+                const requestMessage = prompt(
+                    "Write a short message to this student (optional):"
+                );
+
+                if (requestMessage === null) return;
+
+                sendButton.disabled = true;
+
+                try {
+                    const requestResponse = await fetch("/api/exchange-requests", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            requesterId: studentId,
+                            receiverId: student.student_id,
+                            skillId: student.skill_id,
+                            message: requestMessage.trim()
+                        })
+                    });
+
+                    const result = await requestResponse.json();
+
+                    if (!requestResponse.ok) {
+                        throw new Error(result.message || "Request failed.");
+                    }
+
+                    alert(result.message || "Exchange request sent successfully.");
+
+                } catch (error) {
+                    alert(error.message);
+                } finally {
+                    sendButton.disabled = false;
+                }
+            });
+
+            card.append(name, department, skill, proficiency, sendButton);
+            matchesList.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error finding matches:", error);
+        message.textContent = error.message;
+    }
+});
+
+// -------------------------------------
+// 11. Load incoming exchange requests
+// -------------------------------------
+
+document.getElementById("loadIncomingRequestsButton")
+    .addEventListener("click", loadIncomingRequests);
+
+async function loadIncomingRequests() {
+    const message = document.getElementById("incomingRequestsMessage");
+    const list = document.getElementById("incomingRequestsList");
+
+    message.textContent = "Loading incoming requests...";
+    list.innerHTML = "";
+
+    try {
+        const response = await fetch(`/api/incoming-requests?studentId=${studentId}`);
+        const requests = await response.json();
+
+        if (!response.ok) {
+            throw new Error(requests.message || "Unable to load incoming requests.");
+        }
+
+        if (requests.length === 0) {
+            message.textContent = "You have no incoming exchange requests yet.";
+            return;
+        }
+
+        message.textContent = `You have ${requests.length} incoming request(s).`;
+
+        requests.forEach(request => {
+            const card = document.createElement("div");
+            card.className = "request-card";
+
+            const title = document.createElement("h3");
+            title.textContent = request.requester_name;
+
+            const department = document.createElement("p");
+            department.textContent =
+                `Department: ${request.requester_department || "Not specified"}`;
+
+            const skill = document.createElement("p");
+            skill.textContent = `Wants to learn: ${request.skill_name}`;
+
+            const note = document.createElement("p");
+            note.textContent = `Message: ${request.message || "No message provided"}`;
+
+            const status = document.createElement("p");
+            status.className = "status";
+            status.textContent = `Status: ${request.status}`;
+
+            card.append(title, department, skill, note, status);
+
+            if (request.status === "Pending") {
+                const actions = document.createElement("div");
+                actions.className = "request-actions";
+
+                const acceptButton = document.createElement("button");
+                acceptButton.textContent = "Accept";
+                acceptButton.addEventListener("click", () => {
+                    updateRequestStatus(request.request_id, "Accepted");
+                });
+
+                const rejectButton = document.createElement("button");
+                rejectButton.textContent = "Reject";
+                rejectButton.addEventListener("click", () => {
+                    updateRequestStatus(request.request_id, "Rejected");
+                });
+
+                actions.append(acceptButton, rejectButton);
+                card.appendChild(actions);
+            }
+
+            list.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error loading incoming requests:", error);
+        message.textContent = error.message;
+    }
+}
+
+// -------------------------------------
+// 12. Accept, reject, or complete a request
+// -------------------------------------
+
+async function updateRequestStatus(requestId, status) {
+    try {
+        const response = await fetch(`/api/exchange-requests/${requestId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                studentId,
+                status
+            })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+            throw new Error(result.message || "Unable to update request.");
+        }
+
+        alert(result.message || "Request status updated.");
+        await loadIncomingRequests();
+
+    } catch (error) {
+        alert(error.message);
+    }
+}
+
+// -------------------------------------
+// 13. Load sent exchange requests
+// -------------------------------------
+
+document.getElementById("loadSentRequestsButton")
+    .addEventListener("click", loadSentRequests);
+
+async function loadSentRequests() {
+    const message = document.getElementById("sentRequestsMessage");
+    const list = document.getElementById("sentRequestsList");
+
+    message.textContent = "Loading sent requests...";
+    list.innerHTML = "<p>Please wait...</p>";
+
+    try {
+        console.log("Loading sent requests for student:", studentId);
+
+        const response = await fetch(`/api/sent-requests?studentId=${studentId}`);
+        const requests = await response.json();
+
+        console.log("Sent requests returned:", requests);
+
+        if (!response.ok) {
+            throw new Error(requests.message || "Unable to load sent requests.");
+        }
+
+        list.innerHTML = "";
+
+        if (!Array.isArray(requests) || requests.length === 0) {
+            message.textContent = "You haven't sent any exchange requests yet.";
+            return;
+        }
+
+        message.textContent = `You have sent ${requests.length} exchange request(s).`;
+
+        requests.forEach(request => {
+            const card = document.createElement("div");
+            card.className = "request-card";
+
+            const title = document.createElement("h3");
+            title.textContent = request.skill_name || "Skill Exchange";
+
+            const receiver = document.createElement("p");
+            receiver.textContent = `Sent to: ${request.receiver_name}`;
+
+            const department = document.createElement("p");
+            department.textContent =
+                `Department: ${request.receiver_department || "Not specified"}`;
+
+            const note = document.createElement("p");
+            note.textContent = `Message: ${request.message || "No message added"}`;
+
+            const status = document.createElement("p");
+            status.className = "status";
+            status.textContent = `Status: ${request.status}`;
+
+            const date = document.createElement("p");
+            const createdAt = new Date(request.created_at);
+            date.textContent = `Sent on: ${
+                Number.isNaN(createdAt.getTime())
+                    ? "Date unavailable"
+                    : createdAt.toLocaleString()
+            }`;
+
+            card.append(title, receiver, department, note, status, date);
+            list.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error loading sent requests:", error);
+        message.textContent = error.message;
+        list.innerHTML = "";
+    }
+}
+// -------------------------------------
+// Load accepted learning partners
+// -------------------------------------
+
+
+async function loadAcceptedContacts() {
+    const message = document.getElementById("contactsMessage");
+    const list = document.getElementById("acceptedContactsList");
+
+    if (!studentId) {
+        message.textContent = "Please log in to view your contacts.";
+        return;
+    }
+
+    message.textContent = "Loading learning partners...";
+    list.replaceChildren();
+
+    try {
+        const response = await fetch(
+            `/api/accepted-contacts?studentId=${studentId}`
+        );
+
+        const contacts = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                contacts.message || "Unable to load contacts."
+            );
+        }
+
+        if (contacts.length === 0) {
+            message.textContent =
+                "No accepted exchanges yet. Once a student accepts your request, you can connect here.";
+            return;
+        }
+
+        message.textContent =
+            `You have ${contacts.length} accepted exchange(s).`;
+
+        contacts.forEach(contact => {
+            const card = document.createElement("div");
+            card.className = "request-card";
+
+            const heading = document.createElement("h3");
+            heading.textContent = "🤝 " + contact.contact_name;
+
+            const skill = document.createElement("p");
+            skill.textContent = "Skill Exchange: " + contact.skill_name;
+
+            const department = document.createElement("p");
+            department.textContent =
+                "Department: " +
+                (contact.contact_department || "Not specified");
+
+            const emailLabel = document.createElement("p");
+            emailLabel.textContent = "Email: ";
+
+            const emailLink = document.createElement("a");
+            emailLink.textContent = contact.contact_email;
+            emailLink.href = "mailto:" + contact.contact_email;
+            emailLabel.appendChild(emailLink);
+
+            const status = document.createElement("p");
+            status.className = "status";
+            status.textContent = "Status: Accepted ✅";
+
+            const note = document.createElement("p");
+            note.textContent =
+                "Coordinate your learning session with your partner.";
+
+            const completeButton = document.createElement("button");
+            completeButton.type = "button";
+            completeButton.className = "action-button";
+            completeButton.textContent = "Complete Exchange";
+
+            completeButton.addEventListener("click", async () => {
+                const confirmed = confirm(
+                    `Have you completed your ${contact.skill_name} learning session with ${contact.contact_name}? One credit will be transferred from you to your teacher.`
+                );
+
+                if (!confirmed) return;
+
+                completeButton.disabled = true;
+                completeButton.textContent = "Processing...";
+
+                try {
+                    const completionResponse = await fetch(
+                        `/api/exchange-requests/${contact.request_id}`,
+                        {
+                            method: "PATCH",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                studentId: studentId,
+                                status: "Completed"
+                            })
+                        }
+                    );
+
+                    const result = await completionResponse.json();
+
+                    if (!completionResponse.ok) {
+                        throw new Error(
+                            result.message || "Unable to complete exchange."
+                        );
+                    }
+
+                    alert(result.message);
+
+                    await loadCredits();
+                    await loadAcceptedContacts();
+
+                } catch (error) {
+                    console.error("Exchange completion error:", error);
+                    alert(error.message);
+
+                    completeButton.disabled = false;
+                    completeButton.textContent = "Complete Exchange";
+                }
+            });
+
+            card.append(
+                heading,
+                skill,
+                department,
+                emailLabel,
+                status,
+                note,
+                completeButton
+            );
+
+            list.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("Error loading contacts:", error);
+        message.textContent =
+            "Unable to load contacts. Please try again.";
+    }
+}
+
+
+
+// Refresh contacts when requested
+document
+    .getElementById("refreshContactsButton")
+    .addEventListener("click", loadAcceptedContacts);
+
+// Load contacts when the dashboard opens
+loadAcceptedContacts();
+
+// Load the logged-in student's Skill Credits balance
+async function loadCredits() {
+    const balanceElement = document.getElementById("creditsBalance");
+    const messageElement = document.getElementById("creditsMessage");
+
+    const studentData = sessionStorage.getItem("skillsyncStudent");
+
+    if (!studentData) {
+        balanceElement.textContent = "Please log in";
+        messageElement.textContent = "Log in to view your Skill Credits.";
+        return;
+    }
+
+    try {
+        const student = JSON.parse(studentData);
+        const studentId = student.studentId;
+
+        const response = await fetch(
+            `/api/credits?studentId=${studentId}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Unable to load credits.");
+        }
+
+        balanceElement.textContent = `${data.skillCredits} Credits`;
+
+        messageElement.textContent =
+            "Use your credits to learn new skills and earn credits by teaching others.";
+
+    } catch (error) {
+        console.error("Credit loading error:", error);
+        balanceElement.textContent = "Unavailable";
+        messageElement.textContent =
+            "Could not load your credits. Please refresh the page.";
+    }
+}
+
+loadCredits();
+
+
+</script>
+
+</body>
+</html>
