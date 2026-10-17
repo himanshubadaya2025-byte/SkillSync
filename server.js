@@ -536,7 +536,7 @@ app.post("/api/my-skills", (req, res) => {
                     if (insertErr) {
                         // Another request may have created the same skill.
                         if (insertErr.code === "ER_DUP_ENTRY") {
-                            db.query(
+                            return db.query(
                                 "SELECT skill_id FROM skills WHERE LOWER(skill_name) = LOWER(?) LIMIT 1",
                                 [customSkill],
                                 (findErr, existingSkills) => {
@@ -1114,7 +1114,7 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
       AND status = 'Pending'
 `;
 
-        return db.query(
+        db.query(
             sql,
             [newStatus, newStatus, requestId, studentId],
             (err, result) => {
@@ -1132,11 +1132,13 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                     });
                 }
 
-                return res.json({
+                                return res.json({
                     message: `Exchange request ${newStatus.toLowerCase()} successfully!`
                 });
             }
         );
+
+        return;
     }
 
     // Completing an accepted exchange and transferring credits
@@ -1444,20 +1446,8 @@ app.post("/api/wanted-skills", (req, res) => {
         }
     );
 });
-console.log("Registered Express routes:");
 
-app.router.stack.forEach((layer) => {
-    if (layer.route) {
-        console.log(
-            Object.keys(layer.route.methods).join(",").toUpperCase(),
-            layer.route.path
-        );
-    }
-});
-// Start server
-app.listen(PORT, "0.0.0.0", () => {
-    console.log(`SkillSync server running on port ${PORT}`);
-});
+
 // Get accepted learning partners for a student
 app.get("/api/accepted-contacts", (req, res) => {
     const studentId = Number(req.query.studentId);
@@ -1501,4 +1491,18 @@ app.get("/api/accepted-contacts", (req, res) => {
 
         return res.json(results);
     });
+});
+console.log("Registered Express routes:");
+
+app.router.stack.forEach((layer) => {
+    if (layer.route) {
+        console.log(
+            Object.keys(layer.route.methods).join(",").toUpperCase(),
+            layer.route.path
+        );
+    }
+});
+// Start server
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`SkillSync server running on port ${PORT}`);
 });

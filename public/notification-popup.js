@@ -1,19 +1,30 @@
 (function () {
-    const studentData = localStorage.getItem("skillsyncStudent");
+const studentData =
+localStorage.getItem("skillsyncStudent") ||
+sessionStorage.getItem("skillsyncStudent");
 
-    if (!studentData) return;
+if (!studentData) {
+    console.warn("SkillSync popup: Student data not found in browser storage.");
+    return;
+}
 
-    let student;
+let student;
 
-    try {
-        student = JSON.parse(studentData);
-    } catch {
-        return;
-    }
+try {
+    student = JSON.parse(studentData);
+} catch (error) {
+    console.error("SkillSync popup: Unable to read student data.", error);
+    return;
+}
 
-    if (!student.studentId) return;
+const studentId = student.studentId ?? student.student_id ?? student.id;
 
-    const studentId = student.studentId;
+if (!studentId) {
+    console.warn("SkillSync popup: Student ID not found.", student);
+    return;
+}
+
+
     const STORAGE_KEY = `skillsync_seen_notifications_${studentId}`;
 
     let seenNotifications = new Set();
