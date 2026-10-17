@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Skills | SkillSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            background: white;
+            padding: 15px 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .logout {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .logout:hover {
+            background: #4338ca;
+        }
+
+        .dashboard-layout {
+            max-width: 1500px;
+            margin: 24px auto 36px;
+            padding: 0 22px;
+            display: grid;
+            grid-template-columns: 205px minmax(0, 1fr) 315px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .left-sidebar,
+        .right-sidebar,
+        .center-column {
+            min-width: 0;
+        }
+
+        .left-sidebar,
+        .right-sidebar-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+        }
+
+        .left-sidebar {
+            padding: 18px 12px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .sidebar-label {
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: 8px 12px;
+        }
+
+        .nav-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: #475569;
+            padding: 12px;
+            margin: 3px 0;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .nav-button.logout-link {
+            color: #dc2626;
+        }
+
+        .nav-button.logout-link:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 27px;
+            border-radius: 18px;
+            margin-bottom: 18px;
+        }
+
+        .welcome h1 {
+            font-size: 27px;
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            line-height: 1.6;
+            opacity: .95;
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 18px 15px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            min-width: 0;
+        }
+
+        .summary-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .summary-card h3 {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+            font-weight: 600;
+            margin-bottom: 9px;
+        }
+
+        .summary-value {
+            font-size: 27px;
+            font-weight: bold;
+            color: #4f46e5;
+            overflow-wrap: anywhere;
+        }
+
+        .summary-card:nth-child(2) .summary-value {
+            color: #d97706;
+        }
+
+        .summary-card:nth-child(3) .summary-value {
+            color: #16a34a;
+        }
+
+        .content-section {
+            background: white;
+            padding: 25px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            margin-bottom: 20px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .section-heading h2 {
+            font-size: 20px;
+        }
+
+        .action-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            background: #4338ca;
+        }
+
+        .action-button:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        .message {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 12px 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dbe1ed;
+            border-radius: 9px;
+            font-size: 14px;
+            color: #1e293b;
+            background: white;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px #4f46e51a;
+        }
+
+        .skill-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .skill-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 18px;
+            border-radius: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .skill-icon {
+            font-size: 23px;
+            margin-bottom: 10px;
+        }
+
+        .skill-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .skill-proficiency {
+            display: inline-block;
+            padding: 6px 10px;
+            background: #eef2ff;
+            color: #4338ca;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .empty {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 10px 0;
+            grid-column: 1 / -1;
+        }
+
+        .right-sidebar-card {
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .right-sidebar-card h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .right-sidebar-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .tip-list {
+            list-style: none;
+            margin-top: 12px;
+        }
+
+        .tip-list li {
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 9px;
+        }
+
+        .tip-list li::before {
+            content: "✓ ";
+            color: #4f46e5;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            padding: 30px 15px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-layout {
+                grid-template-columns: 175px minmax(0, 1fr) 270px;
+                gap: 15px;
+                padding: 0 16px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-layout {
+                grid-template-columns: 175px minmax(0, 1fr);
+            }
+
+            .right-sidebar {
+                grid-column: 2;
+            }
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 14px 18px;
+            }
+
+            .dashboard-layout {
+                display: flex;
+                flex-direction: column;
+                padding: 0 14px;
+                margin-top: 16px;
+            }
+
+            .left-sidebar {
+                position: static;
+                width: 100%;
+                padding: 10px;
+            }
+
+            .left-sidebar nav {
+                display: flex;
+                overflow-x: auto;
+                gap: 4px;
+            }
+
+            .sidebar-label {
+                display: none;
+            }
+
+            .nav-button {
+                width: auto;
+                white-space: nowrap;
+                flex: 0 0 auto;
+            }
+
+            .center-column,
+            .right-sidebar {
+                width: 100%;
+            }
+
+            .welcome {
+                padding: 25px;
+            }
+
+            .welcome h1 {
+                font-size: 24px;
+            }
+
+            .content-section {
+                padding: 18px;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .summary-card {
+                padding: 13px 10px;
+            }
+
+            .summary-value {
+                font-size: 23px;
+            }
+
+            .skill-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillSync</div>
+    <button type="button" class="logout" id="logoutButton">Log Out</button>
+</header>
+
+<div class="dashboard-layout">
+
+    <aside class="left-sidebar">
+        <div class="sidebar-label">Workspace</div>
+
+        <nav aria-label="Dashboard navigation">
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/dashboard-redesigned.html'">
+                🏠 Home
+            </button>
+
+            <button type="button" class="nav-button active"
+                onclick="window.location.href='/pages/my-skills.html'">
+                🧠 My Skills
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/learn-skills.html'">
+                🎯 Learn Skills
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/find-partners.html'">
+                🤝 Find Partners
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/requests.html'">
+                📩 Requests
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/partners.html'">
+                👥 Partners
+            </button>
+        </nav>
+
+        <div class="sidebar-label" style="margin-top:16px;">Account</div>
+
+        <nav aria-label="Account navigation">
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/profile.html'">
+                👤 My Profile
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/credit-history.html'">
+                🪙 Credit History
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/notifications.html'">
+                🔔 Notifications
+            </button>
+        </nav>
+
+        <button type="button" class="nav-button logout-link"
+            id="sidebarLogout" style="margin-top:18px;">
+            🚪 Logout
+        </button>
+    </aside>
+
+    <main class="center-column">
+
+        <section class="welcome">
+            <h1 id="welcomeHeading">My Skills 🎯</h1>
+            <p>
+                Add the skills you can teach other students. Your skills help
+                us find suitable learning partners and build a stronger
+                learning community.
+            </p>
+        </section>
+
+        <h2 class="section-title">My Skills Overview</h2>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <div class="summary-icon">🧠</div>
+                <h3>Total Skills</h3>
+                <div class="summary-value" id="totalSkills">0</div>
+            </article>
+
+            <article class="summary-card">
+                <div class="summary-icon">🌱</div>
+                <h3>Beginner</h3>
+                <div class="summary-value" id="beginnerSkills">0</div>
+            </article>
+
+            <article class="summary-card">
+                <div class="summary-icon">🚀</div>
+                <h3>Intermediate / Advanced</h3>
+                <div class="summary-value" id="advancedSkills">0</div>
+            </article>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>➕ Add a New Skill</h2>
+            </div>
+
+            <p class="message">
+                Add a skill you can teach and select the proficiency level
+                that best describes your current knowledge.
+            </p>
+
+            <form id="skillForm">
+                <div class="form-group">
+                    <label for="skillName">Skill Name</label>
+                    <input
+                        type="text"
+                        id="skillName"
+                        placeholder="e.g. Python, Web Development, SQL"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="proficiency">Proficiency Level</label>
+                    <select id="proficiency" required>
+                        <option value="">Select Proficiency</option>
+                        <option value="Beginner">Beginner</option>
+                        <option value="Intermediate">Intermediate</option>
+                        <option value="Advanced">Advanced</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="action-button"
+                    id="addSkillButton">
+                    + Add Skill
+                </button>
+            </form>
+
+            <p id="message" class="message" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>📚 Skills I Can Teach</h2>
+            </div>
+
+            <p class="message">
+                These are the skills currently listed on your profile.
+            </p>
+
+            <div id="skillList" class="skill-list">
+                <p class="empty">Loading your skills...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <aside class="right-sidebar">
+
+        <section class="right-sidebar-card">
+            <h2>💡 Quick Tip</h2>
+            <p>
+                Choose skills you feel comfortable explaining to another
+                student. An accurate proficiency level helps set expectations.
+            </p>
+
+            <ul class="tip-list">
+                <li>Use clear, specific skill names.</li>
+                <li>Choose your proficiency honestly.</li>
+                <li>Keep your skills relevant and up to date.</li>
+            </ul>
+        </section>
+
+        <section class="right-sidebar-card">
+            <h2>🤝 Find Learning Partners</h2>
+            <p>
+                Students looking to learn your skills may be suitable
+                exchange partners.
+            </p>
+
+            <button type="button" class="action-button"
+                style="margin-top:14px;"
+                onclick="window.location.href='/pages/find-partners.html'">
+                Find Partners
+            </button>
+        </section>
+
+        <section class="right-sidebar-card">
+            <h2>🎯 Learn Something New</h2>
+            <p>
+                Explore skills offered by other students and find opportunities
+                to exchange knowledge.
+            </p>
+
+            <button type="button" class="action-button"
+                style="margin-top:14px;"
+                onclick="window.location.href='/pages/learn-skills.html'">
+                Explore Skills
+            </button>
+        </section>
+
+    </aside>
+
+</div>
+
+<footer>
+    SkillSync — Share Skills, Grow Together.
+</footer>
+
+<script>
+    "use strict";
+
+    let student = null;
+
+    try {
+        student = JSON.parse(
+            sessionStorage.getItem("skillsyncStudent") || "null"
+        );
+    } catch (error) {
+        console.error("Unable to read student session:", error);
+    }
+
+    if (!student || !student.studentId) {
+        window.location.href = "/pages/login.html";
+    } else {
+        document.getElementById("welcomeHeading").textContent =
+            `My Skills, ${student.fullName || "Student"} 🎯`;
+
+        const skillList = document.getElementById("skillList");
+        const skillForm = document.getElementById("skillForm");
+        const skillNameInput = document.getElementById("skillName");
+        const proficiencyInput = document.getElementById("proficiency");
+        const message = document.getElementById("message");
+        const addSkillButton = document.getElementById("addSkillButton");
+
+        function createTextElement(tag, className, text) {
+            const element = document.createElement(tag);
+            element.className = className;
+            element.textContent = text;
+            return element;
+        }
+
+        async function loadSkills() {
+            try {
+                const response = await fetch(
+                    `/api/my-skills?studentId=${encodeURIComponent(student.studentId)}`
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || "Could not load skills.");
+                }
+
+                const skills = Array.isArray(data)
+                    ? data
+                    : (data.skills || []);
+
+                document.getElementById("totalSkills").textContent =
+                    skills.length;
+
+                document.getElementById("beginnerSkills").textContent =
+                    skills.filter(skill =>
+                        (skill.proficiency || "").toLowerCase() === "beginner"
+                    ).length;
+
+                document.getElementById("advancedSkills").textContent =
+                    skills.filter(skill =>
+                        ["intermediate", "advanced"].includes(
+                            (skill.proficiency || "").toLowerCase()
+                        )
+                    ).length;
+
+                skillList.replaceChildren();
+
+                if (skills.length === 0) {
+                    skillList.appendChild(
+                        createTextElement(
+                            "p",
+                            "empty",
+                            "You haven't added any skills yet. Add your first skill above!"
+                        )
+                    );
+                    return;
+                }
+
+                skills.forEach(skill => {
+                    const item = document.createElement("article");
+                    item.className = "skill-item";
+
+                    item.appendChild(
+                        createTextElement("div", "skill-icon", "🧠")
+                    );
+
+                    item.appendChild(
+                        createTextElement(
+                            "div",
+                            "skill-name",
+                            skill.skill_name || skill.name || "Unnamed skill"
+                        )
+                    );
+
+                    if (skill.proficiency) {
+                        item.appendChild(
+                            createTextElement(
+                                "span",
+                                "skill-proficiency",
+                                "Level: " + skill.proficiency
+                            )
+                        );
+                    }
+
+                    skillList.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error("Error loading skills:", error);
+
+                document.getElementById("totalSkills").textContent = "—";
+                document.getElementById("beginnerSkills").textContent = "—";
+                document.getElementById("advancedSkills").textContent = "—";
+
+                skillList.replaceChildren();
+
+                skillList.appendChild(
+                    createTextElement(
+                        "p",
+                        "empty",
+                        "Unable to load your skills. Please refresh the page."
+                    )
+                );
+            }
+        }
+
+        skillForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const skillName = skillNameInput.value.trim();
+            const proficiency = proficiencyInput.value;
+
+            if (!skillName || !proficiency) {
+                message.textContent =
+                    "Please enter a skill and select proficiency.";
+                message.style.color = "#b91c1c";
+                return;
+            }
+
+            addSkillButton.disabled = true;
+            message.textContent = "Adding your skill...";
+            message.style.color = "#64748b";
+
+            try {
+                const response = await fetch("/api/my-skills", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        studentId: student.studentId,
+                        customSkill: skillName,
+                        proficiency: proficiency
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || "Could not add skill.");
+                }
+
+                message.textContent =
+                    data.message || "Skill added successfully!";
+                message.style.color = "#166534";
+
+                skillNameInput.value = "";
+                proficiencyInput.value = "";
+
+                await loadSkills();
+
+            } catch (error) {
+                console.error("Add skill error:", error);
+                message.textContent = error.message;
+                message.style.color = "#b91c1c";
+            } finally {
+                addSkillButton.disabled = false;
+            }
+        });
+
+        function logout() {
+            sessionStorage.removeItem("skillsyncStudent");
+            window.location.href = "/pages/login.html";
+        }
+
+        document.getElementById("logoutButton")
+            .addEventListener("click", logout);
+
+        document.getElementById("sidebarLogout")
+            .addEventListener("click", logout);
+
+        loadSkills();
+    }
+</script>
+
+</body>
+</html>
+

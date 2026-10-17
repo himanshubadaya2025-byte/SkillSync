@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | SkillSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            background: white;
+            padding: 15px 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .logout {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .logout:hover {
+            background: #4338ca;
+        }
+
+        .dashboard-layout {
+            max-width: 1500px;
+            margin: 24px auto 36px;
+            padding: 0 22px;
+            display: grid;
+            grid-template-columns: 205px minmax(0, 1fr) 315px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .left-sidebar,
+        .right-sidebar,
+        .center-column {
+            min-width: 0;
+        }
+
+        .left-sidebar,
+        .right-sidebar-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+        }
+
+        .left-sidebar {
+            padding: 18px 12px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .sidebar-label {
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: 8px 12px;
+        }
+
+        .nav-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: #475569;
+            padding: 12px;
+            margin: 3px 0;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .nav-button.logout-link {
+            color: #dc2626;
+        }
+
+        .nav-button.logout-link:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .center-column {
+            min-width: 0;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 27px;
+            border-radius: 18px;
+            margin-bottom: 18px;
+        }
+
+        .welcome h1 {
+            font-size: 27px;
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            line-height: 1.6;
+            opacity: .95;
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 18px 15px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            min-width: 0;
+        }
+
+        .summary-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .summary-card h3 {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+            font-weight: 600;
+            margin-bottom: 9px;
+        }
+
+        .summary-value {
+            font-size: 27px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .summary-card:nth-child(2) .summary-value {
+            color: #d97706;
+        }
+
+        .summary-card:nth-child(3) .summary-value {
+            color: #16a34a;
+        }
+
+        .content-section {
+            background: white;
+            padding: 25px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            margin-bottom: 20px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .section-heading h2 {
+            font-size: 20px;
+        }
+
+        .action-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            background: #4338ca;
+        }
+
+        .message {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 12px 0;
+        }
+
+        .request-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            padding: 18px;
+            margin: 13px 0;
+            border-radius: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .request-card h3 {
+            margin-bottom: 10px;
+            color: #4338ca;
+            font-size: 16px;
+        }
+
+        .request-card p {
+            margin: 8px 0;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 7px;
+        }
+
+        .status.pending {
+            color: #92400e;
+            background: #fef3c7;
+        }
+
+        .status.accepted {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .status.rejected {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        .right-sidebar-card {
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .right-sidebar-card h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .right-sidebar-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            padding: 30px 15px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-layout {
+                grid-template-columns: 175px minmax(0, 1fr) 270px;
+                gap: 15px;
+                padding: 0 16px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-layout {
+                grid-template-columns: 175px minmax(0, 1fr);
+            }
+
+            .right-sidebar {
+                grid-column: 2;
+            }
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 14px 18px;
+            }
+
+            .dashboard-layout {
+                display: flex;
+                flex-direction: column;
+                padding: 0 14px;
+                margin-top: 16px;
+            }
+
+            .left-sidebar {
+                position: static;
+                width: 100%;
+                padding: 10px;
+            }
+
+            .left-sidebar nav {
+                display: flex;
+                overflow-x: auto;
+                gap: 4px;
+            }
+
+            .sidebar-label {
+                display: none;
+            }
+
+            .nav-button {
+                width: auto;
+                white-space: nowrap;
+                flex: 0 0 auto;
+            }
+
+            .center-column,
+            .right-sidebar {
+                width: 100%;
+            }
+
+            .welcome {
+                padding: 25px;
+            }
+
+            .welcome h1 {
+                font-size: 24px;
+            }
+
+            .content-section {
+                padding: 18px;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .summary-card {
+                padding: 13px 10px;
+            }
+
+            .summary-value {
+                font-size: 23px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillSync</div>
+    <button class="logout" id="logoutButton">Log Out</button>
+</header>
+
+<div class="dashboard-layout">
+
+    <!-- Left Sidebar -->
+    <aside class="left-sidebar">
+        <div class="sidebar-label">Workspace</div>
+
+        <nav aria-label="Dashboard navigation">
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/dashboard-redesigned.html'">
+                🏠 Home
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/my-skills.html'">
+                🧠 My Skills
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/learn-skills.html'">
+                🎯 Learn Skills
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/find-partners.html'">
+                🤝 Find Partners
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/requests.html'">
+                📩 Requests
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/partners.html'">
+                👥 Partners
+            </button>
+        </nav>
+
+        <div class="sidebar-label" style="margin-top:16px;">Account</div>
+
+        <nav>
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/profile.html'">
+                👤 My Profile
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/credit-history.html'">
+                🪙 Credit History
+            </button>
+
+            <button type="button" class="nav-button active">
+                🔔 Notifications
+            </button>
+        </nav>
+
+        <button type="button" class="nav-button logout-link"
+            id="sidebarLogout" style="margin-top:18px;">
+            🚪 Logout
+        </button>
+    </aside>
+
+    <!-- Main Column -->
+    <main class="center-column">
+
+        <section class="welcome">
+            <h1 id="welcomeHeading">Your Notifications 🔔</h1>
+            <p>
+                Keep track of your skill exchange requests.
+                See when someone wants to learn from you or responds to your request.
+            </p>
+        </section>
+
+        <h2 class="section-title">Notification Overview</h2>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <div class="summary-icon">🔔</div>
+                <h3>Total Notifications</h3>
+                <div class="summary-value" id="totalCount">0</div>
+            </article>
+
+            <article class="summary-card">
+                <div class="summary-icon">📩</div>
+                <h3>Incoming Requests</h3>
+                <div class="summary-value" id="incomingCount">0</div>
+            </article>
+
+            <article class="summary-card">
+                <div class="summary-icon">🔄</div>
+                <h3>Request Updates</h3>
+                <div class="summary-value" id="updatesCount">0</div>
+            </article>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>🔔 Recent Notifications</h2>
+                <button type="button" class="action-button"
+                    id="refreshNotificationsButton">
+                    ↻ Refresh
+                </button>
+            </div>
+
+            <p class="message" id="notificationMessage" aria-live="polite">
+                Loading notifications...
+            </p>
+
+            <div id="notificationsList"></div>
+        </section>
+
+    </main>
+
+    <!-- Right Column -->
+    <aside class="right-sidebar">
+
+        <section class="right-sidebar-card">
+            <h2>💡 Quick Tip</h2>
+            <p>
+                Check your incoming requests regularly. Accept a request when
+                you're ready to help another student learn a skill.
+            </p>
+        </section>
+
+        <section class="right-sidebar-card">
+            <h2>🤝 Your Skill Exchange</h2>
+            <p>
+                Once a request is accepted, coordinate with your learning
+                partner and complete the exchange through the Requests page.
+            </p>
+
+            <button type="button" class="action-button"
+                style="margin-top:14px;"
+                onclick="window.location.href='/pages/requests.html'">
+                View Requests
+            </button>
+        </section>
+
+    </aside>
+
+</div>
+
+<footer>
+    SkillSync — Share Skills, Grow Together.
+</footer>
+
+<script>
+    "use strict";
+
+    const studentData = sessionStorage.getItem("skillsyncStudent");
+    let currentStudent = null;
+
+    try {
+        currentStudent = studentData ? JSON.parse(studentData) : null;
+    } catch (error) {
+        currentStudent = null;
+    }
+
+    if (!currentStudent || !currentStudent.studentId) {
+        window.location.href = "/pages/login.html";
+    } else {
+        document.getElementById("welcomeHeading").textContent =
+            `Your Notifications, ${currentStudent.fullName || "Student"} 🔔`;
+    }
+
+    const studentId = currentStudent ? currentStudent.studentId : null;
+
+    function logout() {
+        sessionStorage.removeItem("skillsyncStudent");
+        window.location.href = "/pages/login.html";
+    }
+
+    document.getElementById("logoutButton").addEventListener("click", logout);
+    document.getElementById("sidebarLogout").addEventListener("click", logout);
+
+    function createNotificationCard(notification) {
+        const card = document.createElement("article");
+        card.className = "request-card";
+
+        const heading = document.createElement("h3");
+        const details = document.createElement("p");
+        const date = document.createElement("p");
+        const status = document.createElement("span");
+
+        const name = notification.other_student_name || "Another student";
+        const skill = notification.skill_name || "a skill";
+
+        if (
+            notification.notification_type === "Incoming" &&
+            notification.status === "Pending"
+        ) {
+            heading.textContent = "📩 New Exchange Request";
+            details.textContent =
+                `${name} wants to learn ${skill} from you.`;
+        } else if (
+            notification.notification_type === "Outgoing" &&
+            notification.status === "Accepted"
+        ) {
+            heading.textContent = "✅ Request Accepted!";
+            details.textContent =
+                `${name} accepted your request to learn ${skill}.`;
+        } else if (
+            notification.notification_type === "Outgoing" &&
+            notification.status === "Rejected"
+        ) {
+            heading.textContent = "❌ Request Declined";
+            details.textContent =
+                `${name} declined your request to learn ${skill}.`;
+        } else {
+            heading.textContent = "🔔 Skill Exchange Update";
+            details.textContent =
+                `There is an update about ${skill} with ${name}.`;
+        }
+
+        status.className = "status";
+
+        if (notification.status === "Pending") {
+            status.classList.add("pending");
+        } else if (notification.status === "Accepted") {
+            status.classList.add("accepted");
+        } else if (notification.status === "Rejected") {
+            status.classList.add("rejected");
+        }
+
+        status.textContent = `Status: ${notification.status}`;
+
+        date.className = "message";
+        date.style.fontSize = "12px";
+        date.textContent = notification.created_at
+            ? `Date: ${new Date(notification.created_at).toLocaleString("en-IN")}`
+            : "";
+
+        card.append(heading, details, status, date);
+
+        return card;
+    }
+
+    async function loadNotifications() {
+        const message = document.getElementById("notificationMessage");
+        const list = document.getElementById("notificationsList");
+
+        if (!studentId) {
+            message.textContent = "Please log in to view your notifications.";
+            list.replaceChildren();
+            return;
+        }
+
+        message.textContent = "Loading notifications...";
+        list.replaceChildren();
+
+        try {
+            const response = await fetch(
+                `/api/notifications?studentId=${encodeURIComponent(studentId)}`
+            );
+
+            const notifications = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    notifications.message || "Unable to load notifications."
+                );
+            }
+
+            if (!Array.isArray(notifications)) {
+                throw new Error("Unexpected response from the server.");
+            }
+
+            const incoming = notifications.filter(
+                notification => notification.notification_type === "Incoming"
+            );
+
+            const updates = notifications.filter(
+                notification => notification.notification_type === "Outgoing"
+            );
+
+            document.getElementById("totalCount").textContent =
+                notifications.length;
+
+            document.getElementById("incomingCount").textContent =
+                incoming.length;
+
+            document.getElementById("updatesCount").textContent =
+                updates.length;
+
+            if (notifications.length === 0) {
+                message.textContent =
+                    "You're all caught up! No notifications yet.";
+                return;
+            }
+
+            message.textContent =
+                `You have ${notifications.length} notification(s).`;
+
+            notifications.forEach(notification => {
+                list.appendChild(createNotificationCard(notification));
+            });
+
+        } catch (error) {
+            console.error("Notification error:", error);
+
+            document.getElementById("totalCount").textContent = "—";
+            document.getElementById("incomingCount").textContent = "—";
+            document.getElementById("updatesCount").textContent = "—";
+
+            message.textContent =
+                "Unable to load notifications. Please try again.";
+        }
+    }
+
+    document.getElementById("refreshNotificationsButton")
+        .addEventListener("click", loadNotifications);
+
+    loadNotifications();
+</script>
+
+</body>
+</html>
+

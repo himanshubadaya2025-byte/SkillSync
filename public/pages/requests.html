@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requests | SkillSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            height: 68px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: #4f46e5;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .header-logout,
+        .refresh-button {
+            border: none;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 10px 15px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .header-logout:hover,
+        .refresh-button:hover {
+            background: #e0e7ff;
+        }
+
+        .dashboard-layout {
+            max-width: 1500px;
+            margin: 24px auto 36px;
+            padding: 0 22px;
+            display: grid;
+            grid-template-columns: 205px minmax(0, 1fr) 315px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .left-sidebar {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px 12px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .sidebar-heading {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 10px;
+            margin: 8px 0 10px;
+        }
+
+        .nav-button {
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            color: #475569;
+            padding: 11px 10px;
+            margin-bottom: 4px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .nav-button.logout {
+            color: #dc2626;
+            margin-top: 12px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            text-align: left;
+        }
+
+        .nav-button.logout:hover {
+            background: #fef2f2;
+        }
+
+        .center-column {
+            min-width: 0;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 22px;
+        }
+
+        .welcome .eyebrow {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+
+        .welcome h1 {
+            font-size: 29px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .welcome p {
+            font-size: 14px;
+            line-height: 1.7;
+            opacity: 0.95;
+            max-width: 650px;
+        }
+
+        .section-title {
+            font-size: 19px;
+            margin: 26px 0 14px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 19px;
+            min-width: 0;
+        }
+
+        .summary-card .label {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .summary-card .value {
+            color: #4f46e5;
+            font-size: 27px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .content-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 22px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .section-heading h2 {
+            font-size: 19px;
+        }
+
+        .count {
+            background: #eef2ff;
+            color: #4338ca;
+            border-radius: 20px;
+            padding: 6px 11px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .request-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .request-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            min-width: 0;
+            transition: border-color 0.2s;
+        }
+
+        .request-item:hover {
+            border-color: #c7d2fe;
+        }
+
+        .request-item h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #334155;
+            overflow-wrap: anywhere;
+        }
+
+        .request-item p {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+            margin-bottom: 4px;
+        }
+
+        .request-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef2ff;
+            margin-bottom: 13px;
+            font-size: 20px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status.accepted {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status.completed {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 16px;
+        }
+
+        .actions button {
+            padding: 10px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .accept-button {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .reject-button {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .complete-button {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .actions button:hover {
+            filter: brightness(0.97);
+        }
+
+        .actions button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .message {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.8;
+            grid-column: 1 / -1;
+            overflow-wrap: anywhere;
+        }
+
+        #pageMessage {
+            margin-bottom: 18px;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .right-sidebar-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 21px;
+        }
+
+        .right-sidebar-card h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .right-sidebar-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .tip-icon {
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .action-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .action-button:hover {
+            background: #3730a3;
+        }
+
+        .action-button.secondary {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .action-button.secondary:hover {
+            background: #e0e7ff;
+        }
+
+        .quick-link {
+            display: block;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            padding: 8px 20px 24px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-layout {
+                grid-template-columns: 190px minmax(0, 1fr);
+            }
+
+            .right-sidebar {
+                grid-column: 2;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .left-sidebar {
+                position: static;
+            }
+
+            .right-sidebar {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 0 16px;
+            }
+
+            .dashboard-layout {
+                margin-top: 16px;
+                padding: 0 14px;
+                gap: 16px;
+            }
+
+            .left-sidebar {
+                padding: 16px 12px;
+            }
+
+            .left-sidebar nav {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 4px;
+            }
+
+            .sidebar-heading {
+                grid-column: 1 / -1;
+            }
+
+            .nav-button {
+                font-size: 12px;
+                padding: 10px 8px;
+            }
+
+            .nav-button.logout {
+                margin-top: 0;
+            }
+
+            .welcome {
+                padding: 23px;
+            }
+
+            .welcome h1 {
+                font-size: 25px;
+            }
+
+            .content-section {
+                padding: 19px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .summary-card {
+                padding: 15px;
+            }
+
+            .summary-card .value {
+                font-size: 23px;
+            }
+
+            .request-list {
+                grid-template-columns: 1fr;
+            }
+
+            .right-sidebar {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .logo {
+                font-size: 22px;
+            }
+
+            .header-logout,
+            .refresh-button {
+                padding: 9px 10px;
+                font-size: 12px;
+            }
+
+            .welcome h1 {
+                font-size: 22px;
+            }
+
+            .content-section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillSync.</div>
+
+    <div class="header-actions">
+        <button class="refresh-button" id="refreshButton" type="button">
+            ↻ Refresh
+        </button>
+        <button class="header-logout" id="headerLogoutButton" type="button">
+            Log Out
+        </button>
+    </div>
+</header>
+
+<div class="dashboard-layout">
+
+    <aside class="left-sidebar">
+        <div class="sidebar-heading">Workspace</div>
+
+        <nav>
+            <a class="nav-button" href="/pages/dashboard-redesigned.html">🏠 Home</a>
+            <a class="nav-button" href="/pages/my-skills.html">🧠 My Skills</a>
+            <a class="nav-button" href="/pages/learn-skills.html">🎯 Learn Skills</a>
+            <a class="nav-button" href="/pages/find-partners.html">🤝 Find Partners</a>
+            <a class="nav-button active" href="/pages/requests.html">📩 Requests</a>
+            <a class="nav-button" href="/pages/partners.html">👥 Partners</a>
+
+            <div class="sidebar-heading">Account</div>
+
+            <a class="nav-button" href="/pages/profile.html">👤 My Profile</a>
+            <a class="nav-button" href="/pages/credit-history.html">🪙 Credit History</a>
+            <a class="nav-button" href="/pages/notifications.html">🔔 Notifications</a>
+
+            <a class="nav-button logout" href="#" id="logoutButton">🚪 Log Out</a>
+        </nav>
+    </aside>
+
+    <main class="center-column">
+
+        <section class="welcome">
+            <div class="eyebrow">Your Learning Exchanges</div>
+            <h1 id="welcomeTitle">Exchange Requests 📩</h1>
+            <p>
+                Manage incoming learning requests, track the requests you've
+                sent, and complete your skill exchanges with other students.
+            </p>
+        </section>
+
+        <h2 class="section-title">Request Overview</h2>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Incoming Requests</div>
+                <div class="value" id="incomingSummary">—</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Sent Requests</div>
+                <div class="value" id="sentSummary">—</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Pending Incoming</div>
+                <div class="value" id="pendingSummary">—</div>
+            </div>
+        </div>
+
+        <p id="pageMessage" class="message" role="status" aria-live="polite"></p>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>📥 Incoming Requests</h2>
+                <span class="count" id="incomingCount">0 requests</span>
+            </div>
+
+            <div id="incomingList" class="request-list">
+                <p class="message">Loading incoming requests...</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>📤 Sent Requests</h2>
+                <span class="count" id="sentCount">0 requests</span>
+            </div>
+
+            <div id="sentList" class="request-list">
+                <p class="message">Loading sent requests...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <aside class="right-sidebar">
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">💡</div>
+            <h3>How Requests Work</h3>
+            <p>
+                Review incoming requests before accepting or rejecting them.
+                Once a request is accepted, coordinate with your learning
+                partner to complete the exchange.
+            </p>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">🪙</div>
+            <h3>Before Completing</h3>
+            <p>
+                Mark an accepted exchange as completed only after the learning
+                session is finished. The completion action transfers one
+                Skill Credit from the learner to the student teaching the skill.
+            </p>
+
+            <a class="action-button secondary quick-link"
+               href="/pages/credit-history.html">
+                View Credit History
+            </a>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">🤝</div>
+            <h3>Find More Partners</h3>
+            <p>
+                Looking for another skill to learn? Explore suggested partners
+                and discover students with matching skills.
+            </p>
+
+            <a class="action-button quick-link"
+               href="/pages/find-partners.html">
+                Find Partners
+            </a>
+        </section>
+
+    </aside>
+
+</div>
+
+<footer>SkillSync — Share Skills, Grow Together.</footer>
+
+<script>
+    const student = JSON.parse(
+        sessionStorage.getItem("skillsyncStudent") || "null"
+    );
+
+    const incomingList = document.getElementById("incomingList");
+    const sentList = document.getElementById("sentList");
+    const incomingCount = document.getElementById("incomingCount");
+    const sentCount = document.getElementById("sentCount");
+    const pageMessage = document.getElementById("pageMessage");
+
+    if (!student || !student.studentId) {
+        window.location.href = "/pages/login.html";
+    }
+
+    document.getElementById("welcomeTitle").textContent =
+        `Exchange Requests, ${student.fullName || "Student"} 📩`;
+
+    function showPageMessage(text, isError = false) {
+        pageMessage.textContent = text;
+        pageMessage.style.color = isError ? "#b91c1c" : "#166534";
+    }
+
+    function statusClass(status) {
+        return String(status || "").toLowerCase();
+    }
+
+    function makeTextElement(tag, className, text) {
+        const element = document.createElement(tag);
+        element.className = className;
+        element.textContent = text;
+        return element;
+    }
+
+    function formatDate(value) {
+        if (!value) return "Date unavailable";
+
+        const date = new Date(value);
+
+        if (Number.isNaN(date.getTime())) {
+            return String(value);
+        }
+
+        return date.toLocaleString();
+    }
+
+    function createRequestCard(request, type) {
+        const card = document.createElement("article");
+        card.className = "request-item";
+
+        const otherStudentName = type === "incoming"
+            ? request.requester_name
+            : request.receiver_name;
+
+        const otherDepartment = type === "incoming"
+            ? request.requester_department
+            : request.receiver_department;
+
+        const icon = makeTextElement("div", "request-icon", "🤝");
+        card.appendChild(icon);
+
+        card.appendChild(makeTextElement(
+            "h3",
+            "",
+            otherStudentName || "SkillSync Student"
+        ));
+
+        card.appendChild(makeTextElement(
+            "p",
+            "",
+            "Skill: " + (request.skill_name || "Not specified")
+        ));
+
+        if (otherDepartment) {
+            card.appendChild(makeTextElement(
+                "p",
+                "",
+                "Department: " + otherDepartment
+            ));
+        }
+
+        if (request.message) {
+            card.appendChild(makeTextElement(
+                "p",
+                "",
+                "Message: " + request.message
+            ));
+        }
+
+        card.appendChild(makeTextElement(
+            "p",
+            "",
+            "Request ID: #" + request.request_id
+        ));
+
+        card.appendChild(makeTextElement(
+            "p",
+            "",
+            "Date: " + formatDate(request.created_at)
+        ));
+
+        const status = String(request.status || "Pending");
+
+        card.appendChild(makeTextElement(
+            "span",
+            "status " + statusClass(status),
+            status
+        ));
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        if (type === "incoming" && status === "Pending") {
+            const acceptButton = makeTextElement(
+                "button",
+                "accept-button",
+                "✓ Accept"
+            );
+
+            acceptButton.type = "button";
+
+            const rejectButton = makeTextElement(
+                "button",
+                "reject-button",
+                "✕ Reject"
+            );
+
+            rejectButton.type = "button";
+
+            acceptButton.addEventListener("click", () => {
+                updateRequest(
+                    request.request_id,
+                    "Accepted",
+                    acceptButton,
+                    rejectButton
+                );
+            });
+
+            rejectButton.addEventListener("click", () => {
+                updateRequest(
+                    request.request_id,
+                    "Rejected",
+                    rejectButton,
+                    acceptButton
+                );
+            });
+
+            actions.appendChild(acceptButton);
+            actions.appendChild(rejectButton);
+        }
+
+        if (
+            type === "sent" &&
+            status === "Accepted" &&
+            Number(request.requester_id || student.studentId) ===
+                Number(student.studentId)
+        ) {
+            const completeButton = makeTextElement(
+                "button",
+                "complete-button",
+                "✓ Mark Completed"
+            );
+
+            completeButton.type = "button";
+
+            completeButton.addEventListener("click", () => {
+                const confirmed = window.confirm(
+                    "Mark this learning exchange as completed? One Skill Credit will be transferred from you to the student teaching the skill."
+                );
+
+                if (confirmed) {
+                    updateRequest(
+                        request.request_id,
+                        "Completed",
+                        completeButton
+                    );
+                }
+            });
+
+            actions.appendChild(completeButton);
+        }
+
+        if (actions.childElementCount > 0) {
+            card.appendChild(actions);
+        }
+
+        return card;
+    }
+
+    async function fetchRequestList(endpoint) {
+        const response = await fetch(
+            endpoint + "?studentId=" +
+            encodeURIComponent(student.studentId)
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Could not load requests.");
+        }
+
+        if (Array.isArray(data)) {
+            return data;
+        }
+
+        return data.requests || data.results || [];
+    }
+
+    function renderRequestList(container, requests, type) {
+        container.replaceChildren();
+
+        if (!requests.length) {
+            const emptyMessage = type === "incoming"
+                ? "You don't have any incoming requests yet. New requests from other students will appear here."
+                : "You haven't sent any exchange requests yet. Visit Find Partners to discover learning opportunities.";
+
+            container.appendChild(
+                makeTextElement("p", "message", emptyMessage)
+            );
+
+            return;
+        }
+
+        requests.forEach(request => {
+            container.appendChild(createRequestCard(request, type));
+        });
+    }
+
+    function updateCountLabel(element, count) {
+        element.textContent =
+            `${count} ${count === 1 ? "request" : "requests"}`;
+    }
+
+    async function loadRequests() {
+        showPageMessage("");
+
+        incomingList.replaceChildren(
+            makeTextElement(
+                "p",
+                "message",
+                "Loading incoming requests..."
+            )
+        );
+
+        sentList.replaceChildren(
+            makeTextElement(
+                "p",
+                "message",
+                "Loading sent requests..."
+            )
+        );
+
+        try {
+            const [incoming, sent] = await Promise.all([
+                fetchRequestList("/api/incoming-requests"),
+                fetchRequestList("/api/sent-requests")
+            ]);
+
+            updateCountLabel(incomingCount, incoming.length);
+            updateCountLabel(sentCount, sent.length);
+
+            document.getElementById("incomingSummary").textContent =
+                incoming.length;
+
+            document.getElementById("sentSummary").textContent =
+                sent.length;
+
+            const pendingIncoming = incoming.filter(
+                request =>
+                    String(request.status || "").toLowerCase() === "pending"
+            ).length;
+
+            document.getElementById("pendingSummary").textContent =
+                pendingIncoming;
+
+            renderRequestList(incomingList, incoming, "incoming");
+            renderRequestList(sentList, sent, "sent");
+
+        } catch (error) {
+            console.error("Error loading requests:", error);
+
+            incomingList.replaceChildren(
+                makeTextElement(
+                    "p",
+                    "message",
+                    "Unable to load incoming requests."
+                )
+            );
+
+            sentList.replaceChildren(
+                makeTextElement(
+                    "p",
+                    "message",
+                    "Unable to load sent requests."
+                )
+            );
+
+            showPageMessage(error.message, true);
+        }
+    }
+
+    async function updateRequest(
+        requestId,
+        status,
+        clickedButton,
+        otherButton
+    ) {
+        if (clickedButton) clickedButton.disabled = true;
+        if (otherButton) otherButton.disabled = true;
+
+        showPageMessage("");
+
+        try {
+            const response = await fetch(
+                "/api/exchange-requests/" + encodeURIComponent(requestId),
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        studentId: student.studentId,
+                        status: status
+                    })
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Could not update the request."
+                );
+            }
+
+            showPageMessage(
+                data.message || "Request updated successfully."
+            );
+
+            await loadRequests();
+
+        } catch (error) {
+            console.error("Request update error:", error);
+
+            showPageMessage(error.message, true);
+
+            if (clickedButton) clickedButton.disabled = false;
+            if (otherButton) otherButton.disabled = false;
+        }
+    }
+
+    document.getElementById("refreshButton").addEventListener(
+        "click",
+        loadRequests
+    );
+
+    function logout() {
+        sessionStorage.removeItem("skillsyncStudent");
+        window.location.href = "/pages/login.html";
+    }
+
+    document.getElementById("logoutButton").addEventListener(
+        "click",
+        function(event) {
+            event.preventDefault();
+            logout();
+        }
+    );
+
+    document.getElementById("headerLogoutButton").addEventListener(
+        "click",
+        logout
+    );
+
+    loadRequests();
+</script>
+
+</body>
+</html>

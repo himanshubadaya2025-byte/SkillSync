@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Dashboard | SkillSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            height: 68px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: #4f46e5;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .header-logout {
+            border: none;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 10px 16px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .header-logout:hover {
+            background: #e0e7ff;
+        }
+
+        .dashboard-layout {
+            max-width: 1500px;
+            margin: 24px auto 36px;
+            padding: 0 22px;
+            display: grid;
+            grid-template-columns: 205px minmax(0, 1fr) 315px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .left-sidebar {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px 12px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .sidebar-heading {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 10px;
+            margin: 8px 0 10px;
+        }
+
+        .nav-button {
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            color: #475569;
+            padding: 11px 10px;
+            margin-bottom: 4px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+            border: none;
+            background: transparent;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .nav-button.logout {
+            color: #dc2626;
+            margin-top: 12px;
+        }
+
+        .nav-button.logout:hover {
+            background: #fef2f2;
+        }
+
+        .center-column {
+            min-width: 0;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 22px;
+        }
+
+        .welcome .eyebrow {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+
+        .welcome h1 {
+            font-size: 29px;
+            margin-bottom: 10px;
+            line-height: 1.35;
+        }
+
+        .welcome p {
+            font-size: 14px;
+            line-height: 1.7;
+            opacity: 0.95;
+        }
+
+        .section-title {
+            font-size: 19px;
+            margin: 26px 0 14px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 19px;
+            min-width: 0;
+        }
+
+        .summary-card .label {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .summary-card .value {
+            color: #4f46e5;
+            font-size: 27px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .summary-card .value.green {
+            color: #16a34a;
+        }
+
+        .summary-card .value.orange {
+            color: #d97706;
+        }
+
+        .content-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 22px;
+            min-width: 0;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .section-heading h2 {
+            font-size: 19px;
+        }
+
+        .section-description {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.8;
+            margin-bottom: 17px;
+        }
+
+        .action-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 9px;
+            padding: 11px 15px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .action-button:hover {
+            background: #4338ca;
+        }
+
+        .action-button.secondary {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .action-button.secondary:hover {
+            background: #e0e7ff;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 17px;
+            min-width: 0;
+        }
+
+        .feature-icon {
+            font-size: 27px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card h3 {
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 9px;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .feature-card .action-button {
+            width: 100%;
+            padding: 10px 8px;
+            font-size: 12px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 500px;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        thead {
+            background: #f8fafc;
+        }
+
+        th {
+            text-align: left;
+            color: #64748b;
+            font-size: 12px;
+            padding: 13px 11px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px 11px;
+            border-bottom: 1px solid #eef2f7;
+            font-size: 12px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+            vertical-align: top;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .credit-earned {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .credit-spent {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .request-card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            margin: 12px 0;
+            border-radius: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .request-card h3 {
+            margin-bottom: 9px;
+            color: #4338ca;
+            font-size: 14px;
+        }
+
+        .request-card p {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.8;
+            margin: 5px 0;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .status.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status.accepted {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .message {
+            padding: 18px 10px;
+            color: #64748b;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .profile-row {
+            padding: 12px 0;
+            border-bottom: 1px solid #eef2f7;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-row:last-child {
+            border-bottom: none;
+        }
+
+        .profile-row strong {
+            display: inline-block;
+            min-width: 105px;
+            color: #64748b;
+        }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .right-sidebar-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 21px;
+            min-width: 0;
+        }
+
+        .right-sidebar-card h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .right-sidebar-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .tip-icon {
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .right-sidebar-card .action-button {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            padding: 8px 20px 24px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-layout {
+                grid-template-columns: 190px minmax(0, 1fr);
+            }
+
+            .right-sidebar {
+                grid-column: 2;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .left-sidebar {
+                position: static;
+            }
+
+            .right-sidebar {
+                grid-column: 1;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 0 16px;
+            }
+
+            .dashboard-layout {
+                margin-top: 16px;
+                padding: 0 14px;
+                gap: 16px;
+            }
+
+            .left-sidebar {
+                padding: 15px 12px;
+            }
+
+            .left-sidebar nav {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 4px;
+            }
+
+            .sidebar-heading {
+                grid-column: 1 / -1;
+            }
+
+            .nav-button {
+                font-size: 12px;
+                padding: 10px 8px;
+            }
+
+            .welcome {
+                padding: 23px;
+            }
+
+            .welcome h1 {
+                font-size: 25px;
+            }
+
+            .summary-grid,
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-card {
+                padding: 15px;
+            }
+
+            .summary-card .value {
+                font-size: 23px;
+            }
+
+            .content-section {
+                padding: 18px;
+            }
+
+            .right-sidebar {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .logo {
+                font-size: 22px;
+            }
+
+            .header-logout {
+                padding: 9px 11px;
+                font-size: 12px;
+            }
+
+            .welcome h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillSync.</div>
+    <button type="button" class="header-logout" id="logoutButton">
+        Log Out
+    </button>
+</header>
+
+<div class="dashboard-layout">
+
+    <aside class="left-sidebar">
+        <div class="sidebar-heading">Workspace</div>
+
+        <nav aria-label="Dashboard navigation">
+            <a class="nav-button active" href="/pages/dashboard-redesigned.html">🏠 Home</a>
+            <a class="nav-button" href="/pages/my-skills.html">🧠 My Skills</a>
+            <a class="nav-button" href="/pages/learn-skills.html">🎯 Learn Skills</a>
+            <a class="nav-button" href="/pages/find-partners.html">🤝 Find Partners</a>
+            <a class="nav-button" href="/pages/requests.html">📩 Requests</a>
+            <a class="nav-button" href="/pages/partners.html">👥 Partners</a>
+
+            <div class="sidebar-heading">Account</div>
+
+            <a class="nav-button" href="/pages/profile.html">👤 My Profile</a>
+            <a class="nav-button" href="/pages/credit-history.html">🪙 Credit History</a>
+            <a class="nav-button" href="/pages/notifications.html">🔔 Notifications</a>
+
+            <button type="button" class="nav-button logout" id="sidebarLogoutButton">
+                🚪 Log Out
+            </button>
+        </nav>
+    </aside>
+
+    <main class="center-column">
+
+        <section class="welcome">
+            <div class="eyebrow">Your Learning Community</div>
+
+            <h1 id="welcomeHeading">Welcome to SkillSync!</h1>
+
+            <p>
+                Learn something new. Share what you know.
+                Connect with students and grow your skills together.
+            </p>
+        </section>
+
+        <h2 class="section-title">Your Skill Credits 🪙</h2>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Available Skill Credits</div>
+                <div class="value" id="creditsBalance">Loading...</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Learning & Teaching</div>
+                <div class="value green">🤝</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Your Learning Journey</div>
+                <div class="value orange">📈</div>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h2 class="section-title" style="margin-top: 0;">
+                Your Learning Space
+            </h2>
+
+            <p class="section-description">
+                Manage the skills you can teach, choose what you want to learn,
+                and connect with students who can help you grow.
+            </p>
+
+            <div class="feature-grid">
+
+                <article class="feature-card">
+                    <div class="feature-icon">🧠</div>
+                    <h3>Skills I Can Teach</h3>
+                    <p>
+                        Add skills you know and help other students learn
+                        from your experience.
+                    </p>
+                    <a class="action-button secondary" href="/pages/my-skills.html">
+                        Manage My Skills
+                    </a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Skills I Want to Learn</h3>
+                    <p>
+                        Choose skills you want to develop with help
+                        from other students.
+                    </p>
+                    <a class="action-button secondary" href="/pages/learn-skills.html">
+                        Explore Learning
+                    </a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">🤝</div>
+                    <h3>Skill Exchange</h3>
+                    <p>
+                        Find students who can teach you and exchange
+                        knowledge with your peers.
+                    </p>
+                    <a class="action-button secondary" href="/pages/find-partners.html">
+                        Find Students
+                    </a>
+                </article>
+
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>Credit History 📜</h2>
+                <a class="action-button secondary" href="/pages/credit-history.html">
+                    View Full History
+                </a>
+            </div>
+
+            <p class="section-description" id="creditHistoryMessage">
+                Loading your transaction history...
+            </p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Activity</th>
+                            <th>Skill</th>
+                            <th>Person</th>
+                            <th>Credits</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="creditHistoryBody">
+                        <tr>
+                            <td colspan="5" class="message">
+                                Loading transactions...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <aside class="right-sidebar">
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">👤</div>
+            <h3>My Profile</h3>
+
+            <p>
+                Check your account details and make sure your student
+                information is up to date.
+            </p>
+
+            <div class="profile-row">
+                <strong>Name</strong>
+                <span id="studentName">Loading...</span>
+            </div>
+
+            <div class="profile-row">
+                <strong>Email</strong>
+                <span id="studentEmail">Loading...</span>
+            </div>
+
+            <div class="profile-row">
+                <strong>Department</strong>
+                <span id="studentDepartment">Loading...</span>
+            </div>
+
+            <a class="action-button secondary" href="/pages/profile.html">
+                View My Profile
+            </a>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">🔔</div>
+
+            <div class="section-heading">
+                <h3>Notifications</h3>
+
+                <button
+                    type="button"
+                    id="refreshNotificationsButton"
+                    class="action-button secondary">
+                    ↻
+                </button>
+            </div>
+
+            <p id="notificationMessage" aria-live="polite">
+                Loading notifications...
+            </p>
+
+            <div id="notificationsList"></div>
+
+            <a class="action-button secondary" href="/pages/notifications.html">
+                View All Notifications
+            </a>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">💡</div>
+            <h3>Keep Growing</h3>
+
+            <p>
+                Every student has something valuable to share.
+                Teach what you know, learn something new, and
+                build meaningful learning connections.
+            </p>
+
+            <a class="action-button" href="/pages/requests.html">
+                View Requests
+            </a>
+        </section>
+
+    </aside>
+
+</div>
+
+<footer>SkillSync — Share Skills, Grow Together.</footer>
+
+<script>
+    "use strict";
+
+    // -------------------------------------
+    // 1. Logged-in student and profile
+    // -------------------------------------
+
+    const studentData = sessionStorage.getItem("skillsyncStudent");
+    let currentStudent = null;
+
+    if (!studentData) {
+        window.location.replace("/pages/login.html");
+    } else {
+        try {
+            currentStudent = JSON.parse(studentData);
+
+            const studentId =
+                currentStudent?.studentId ??
+                currentStudent?.student_id ??
+                currentStudent?.id;
+
+            if (!currentStudent || studentId == null) {
+                throw new Error("Invalid student session.");
+            }
+
+            currentStudent.studentId = studentId;
+
+            document.getElementById("welcomeHeading").textContent =
+                `Welcome, ${currentStudent.fullName || currentStudent.name || "Student"}!`;
+
+            document.getElementById("studentName").textContent =
+                currentStudent.fullName ||
+                currentStudent.name ||
+                currentStudent.studentName ||
+                "Not specified";
+
+            document.getElementById("studentEmail").textContent =
+                currentStudent.email ||
+                currentStudent.studentEmail ||
+                "Not specified";
+
+            document.getElementById("studentDepartment").textContent =
+                currentStudent.department ||
+                currentStudent.studentDepartment ||
+                "Not specified";
+
+        } catch (error) {
+            console.error("Student session error:", error);
+            sessionStorage.removeItem("skillsyncStudent");
+            window.location.replace("/pages/login.html");
+        }
+    }
+
+    const studentId = currentStudent
+        ? currentStudent.studentId
+        : null;
+
+    // -------------------------------------
+    // 2. Logout
+    // -------------------------------------
+
+    function logout() {
+        sessionStorage.removeItem("skillsyncStudent");
+        window.location.href = "/pages/login.html";
+    }
+
+    document.getElementById("logoutButton")
+        .addEventListener("click", logout);
+
+    document.getElementById("sidebarLogoutButton")
+        .addEventListener("click", logout);
+
+    // -------------------------------------
+    // 3. Load Skill Credits balance
+    // -------------------------------------
+
+    async function loadCredits() {
+        const balanceElement =
+            document.getElementById("creditsBalance");
+
+        if (!studentId) {
+            balanceElement.textContent = "Unavailable";
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `/api/credits?studentId=${encodeURIComponent(studentId)}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Unable to load credits."
+                );
+            }
+
+            balanceElement.textContent =
+                `${data.skillCredits ?? 0} Credits`;
+
+        } catch (error) {
+            console.error("Credit loading error:", error);
+            balanceElement.textContent = "Unavailable";
+        }
+    }
+
+    // -------------------------------------
+    // 4. Load credit transaction history
+    // -------------------------------------
+
+    async function loadCreditHistory() {
+        const historyMessage =
+            document.getElementById("creditHistoryMessage");
+
+        const historyBody =
+            document.getElementById("creditHistoryBody");
+
+        if (!studentId) {
+            historyMessage.textContent =
+                "Please log in to view your credit history.";
+            historyBody.replaceChildren();
+            return;
+        }
+
+        historyMessage.textContent =
+            "Loading your transaction history...";
+
+        historyBody.replaceChildren();
+
+        try {
+            const response = await fetch(
+                `/api/credit-history?studentId=${encodeURIComponent(studentId)}`
+            );
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    result.message || "Unable to load credit history."
+                );
+            }
+
+            const transactions = Array.isArray(result)
+                ? result
+                : result.transactions ?? result.history ?? [];
+
+            if (transactions.length === 0) {
+                historyMessage.textContent =
+                    "No credit transactions yet.";
+
+                const row = document.createElement("tr");
+                const cell = document.createElement("td");
+
+                cell.colSpan = 5;
+                cell.className = "message";
+                cell.textContent = "Your transactions will appear here.";
+
+                row.appendChild(cell);
+                historyBody.appendChild(row);
+                return;
+            }
+
+            historyMessage.textContent =
+                `${transactions.length} transaction(s) recorded.`;
+
+            transactions.forEach(transaction => {
+                const row = document.createElement("tr");
+
+                const dateCell = document.createElement("td");
+                const activityCell = document.createElement("td");
+                const skillCell = document.createElement("td");
+                const personCell = document.createElement("td");
+                const creditsCell = document.createElement("td");
+
+                const dateValue =
+                    transaction.created_at ??
+                    transaction.transaction_date ??
+                    transaction.date;
+
+                const date = dateValue
+                    ? new Date(dateValue)
+                    : null;
+
+                dateCell.textContent =
+                    date && !Number.isNaN(date.getTime())
+                        ? date.toLocaleString([], {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                        })
+                        : "—";
+
+                const type = transaction.transaction_type || "Transaction";
+
+                if (type === "Spent") {
+                    activityCell.textContent = "Learned";
+                    personCell.textContent =
+                        transaction.other_student_name ||
+                        "Learning partner";
+                } else if (type === "Earned") {
+                    activityCell.textContent = "Taught";
+                    personCell.textContent =
+                        transaction.other_student_name ||
+                        "Learning partner";
+                } else if (type === "Starter") {
+                    activityCell.textContent = "Starter credits";
+                    personCell.textContent = "SkillSync";
+                } else if (type === "Connected") {
+                    activityCell.textContent = "Connected";
+                    personCell.textContent =
+                        transaction.other_student_name || "Learning partner";
+                } else {
+                    activityCell.textContent = type;
+                    personCell.textContent =
+                        transaction.other_student_name || "—";
+                }
+
+                skillCell.textContent =
+                    transaction.skill_name || "—";
+
+                const amount = Number(
+                    transaction.amount ??
+                    transaction.credits ??
+                    transaction.credit_change ??
+                    transaction.change_amount ??
+                    0
+                );
+
+                creditsCell.textContent =
+                    amount > 0 ? `+${amount}` : `${amount}`;
+
+                creditsCell.className =
+                    amount > 0
+                        ? "credit-earned"
+                        : amount < 0
+                            ? "credit-spent"
+                            : "";
+
+                row.append(
+                    dateCell,
+                    activityCell,
+                    skillCell,
+                    personCell,
+                    creditsCell
+                );
+
+                historyBody.appendChild(row);
+            });
+
+        } catch (error) {
+            console.error("Credit history error:", error);
+
+            historyMessage.textContent =
+                "Unable to load credit history. Please try again.";
+
+            historyBody.replaceChildren();
+
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+
+            cell.colSpan = 5;
+            cell.className = "message";
+            cell.textContent = "Unable to load transactions.";
+
+            row.appendChild(cell);
+            historyBody.appendChild(row);
+        }
+    }
+
+    // -------------------------------------
+    // 5. Load notifications
+    // -------------------------------------
+
+    async function loadNotifications() {
+        const message =
+            document.getElementById("notificationMessage");
+
+        const list =
+            document.getElementById("notificationsList");
+
+        if (!studentId) {
+            message.textContent =
+                "Please log in to view notifications.";
+            return;
+        }
+
+        message.textContent = "Loading notifications...";
+        list.replaceChildren();
+
+        try {
+            const response = await fetch(
+                `/api/notifications?studentId=${encodeURIComponent(studentId)}`
+            );
+
+            const notifications = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    notifications.message ||
+                    "Unable to load notifications."
+                );
+            }
+
+            if (
+                !Array.isArray(notifications) ||
+                notifications.length === 0
+            ) {
+                message.textContent =
+                    "You're all caught up! No notifications yet.";
+                return;
+            }
+
+            const visibleNotifications = notifications.filter(notification =>
+                notification.notification_type === "Incoming" ||
+                ["Accepted", "Rejected"].includes(notification.status)
+            );
+
+            if (visibleNotifications.length === 0) {
+                message.textContent =
+                    "You're all caught up! No notifications yet.";
+                return;
+            }
+
+            message.textContent =
+                `${visibleNotifications.length} notification(s).`;
+
+            visibleNotifications.slice(0, 4).forEach(notification => {
+                const card = document.createElement("div");
+                card.className = "request-card";
+
+                const heading = document.createElement("h3");
+                const details = document.createElement("p");
+                const status = document.createElement("span");
+
+                const name =
+                    notification.other_student_name || "Another student";
+
+                const skill =
+                    notification.skill_name || "a skill";
+
+                if (notification.notification_type === "Incoming") {
+                    heading.textContent = "📩 New Exchange Request";
+                    details.textContent =
+                        `${name} wants to learn ${skill} from you.`;
+                } else if (notification.status === "Accepted") {
+                    heading.textContent = "✅ Request Accepted";
+                    details.textContent =
+                        `${name} accepted your request to learn ${skill}.`;
+                } else {
+                    heading.textContent = "❌ Request Declined";
+                    details.textContent =
+                        `${name} declined your request to learn ${skill}.`;
+                }
+
+                status.className =
+                    "status " +
+                    String(notification.status || "pending").toLowerCase();
+
+                status.textContent =
+                    `Status: ${notification.status || "Pending"}`;
+
+                card.append(heading, details, status);
+                list.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error("Notification error:", error);
+
+            message.textContent =
+                "Unable to load notifications. Please try again.";
+        }
+    }
+
+    document.getElementById("refreshNotificationsButton")
+        .addEventListener("click", loadNotifications);
+
+    // -------------------------------------
+    // 6. Load dashboard information
+    // -------------------------------------
+
+    if (studentId) {
+        loadCredits();
+        loadCreditHistory();
+        loadNotifications();
+    }
+</script>
+
+</body>
+</html>

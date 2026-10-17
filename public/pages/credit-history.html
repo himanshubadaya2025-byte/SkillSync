@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit History | SkillSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            height: 68px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: #4f46e5;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .header-logout {
+            border: none;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 10px 16px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .header-logout:hover {
+            background: #e0e7ff;
+        }
+
+        .dashboard-layout {
+            max-width: 1500px;
+            margin: 24px auto 36px;
+            padding: 0 22px;
+            display: grid;
+            grid-template-columns: 205px minmax(0, 1fr) 315px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .left-sidebar {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px 12px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .sidebar-heading {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 10px;
+            margin: 8px 0 10px;
+        }
+
+        .nav-button {
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            color: #475569;
+            padding: 11px 10px;
+            margin-bottom: 4px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .nav-button.logout {
+            color: #dc2626;
+            margin-top: 12px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            text-align: left;
+        }
+
+        .nav-button.logout:hover {
+            background: #fef2f2;
+        }
+
+        .center-column {
+            min-width: 0;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 22px;
+        }
+
+        .welcome .eyebrow {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+
+        .welcome h1 {
+            font-size: 29px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .welcome p {
+            font-size: 14px;
+            line-height: 1.7;
+            opacity: 0.95;
+            max-width: 650px;
+        }
+
+        .section-title {
+            font-size: 19px;
+            margin: 26px 0 14px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 19px;
+            min-width: 0;
+        }
+
+        .summary-card .label {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .summary-card .value {
+            color: #4f46e5;
+            font-size: 27px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .summary-card .value.earned {
+            color: #16a34a;
+        }
+
+        .summary-card .value.spent {
+            color: #d97706;
+        }
+
+        .content-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 22px;
+            min-width: 0;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .section-heading h2 {
+            font-size: 19px;
+        }
+
+        .section-description {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+            margin: -7px 0 18px;
+        }
+
+        .action-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 17px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .action-button:hover {
+            background: #3730a3;
+        }
+
+        .action-button.secondary {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .action-button.secondary:hover {
+            background: #e0e7ff;
+        }
+
+        .action-button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+            background: white;
+        }
+
+        thead {
+            background: #f8fafc;
+        }
+
+        th {
+            text-align: left;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 15px 13px;
+            border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 15px 13px;
+            border-bottom: 1px solid #eef2f7;
+            font-size: 13px;
+            line-height: 1.7;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: #fafaff;
+        }
+
+        .credit-earned {
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        .credit-spent {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .transaction-type {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 7px;
+            font-size: 11px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .transaction-type.earned {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .transaction-type.spent {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .transaction-type.connected {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .message {
+            padding: 25px 12px;
+            color: #64748b;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .page-message {
+            color: #dc2626;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-top: 15px;
+            overflow-wrap: anywhere;
+        }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .right-sidebar-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 21px;
+        }
+
+        .right-sidebar-card h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .right-sidebar-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .tip-icon {
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .quick-link {
+            display: block;
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            padding: 8px 20px 24px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-layout {
+                grid-template-columns: 190px minmax(0, 1fr);
+            }
+
+            .right-sidebar {
+                grid-column: 2;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .left-sidebar {
+                position: static;
+            }
+
+            .right-sidebar {
+                grid-column: 1;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 0 16px;
+            }
+
+            .dashboard-layout {
+                margin-top: 16px;
+                padding: 0 14px;
+                gap: 16px;
+            }
+
+            .left-sidebar {
+                padding: 16px 12px;
+            }
+
+            .left-sidebar nav {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 4px;
+            }
+
+            .sidebar-heading {
+                grid-column: 1 / -1;
+            }
+
+            .nav-button {
+                font-size: 12px;
+                padding: 10px 8px;
+            }
+
+            .nav-button.logout {
+                margin-top: 0;
+            }
+
+            .welcome {
+                padding: 23px;
+            }
+
+            .welcome h1 {
+                font-size: 25px;
+            }
+
+            .content-section {
+                padding: 19px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .summary-card {
+                padding: 15px;
+            }
+
+            .summary-card .value {
+                font-size: 23px;
+            }
+
+            .right-sidebar {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .logo {
+                font-size: 22px;
+            }
+
+            .header-logout {
+                padding: 9px 11px;
+                font-size: 12px;
+            }
+
+            .welcome h1 {
+                font-size: 22px;
+            }
+
+            .content-section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillSync.</div>
+    <button class="header-logout" id="headerLogoutButton">Log Out</button>
+</header>
+
+<div class="dashboard-layout">
+
+    <aside class="left-sidebar">
+        <div class="sidebar-heading">Workspace</div>
+
+        <nav>
+            <a class="nav-button" href="/pages/dashboard-redesigned.html">🏠 Home</a>
+            <a class="nav-button" href="/pages/my-skills.html">🧠 My Skills</a>
+            <a class="nav-button" href="/pages/learn-skills.html">🎯 Learn Skills</a>
+            <a class="nav-button" href="/pages/find-partners.html">🤝 Find Partners</a>
+            <a class="nav-button" href="/pages/requests.html">📩 Requests</a>
+            <a class="nav-button" href="/pages/partners.html">👥 Partners</a>
+
+            <div class="sidebar-heading">Account</div>
+
+            <a class="nav-button" href="/pages/profile.html">👤 My Profile</a>
+            <a class="nav-button active" href="/pages/credit-history.html">🪙 Credit History</a>
+            <a class="nav-button" href="/pages/notifications.html">🔔 Notifications</a>
+
+            <a class="nav-button logout" href="#" id="logoutButton">🚪 Log Out</a>
+        </nav>
+    </aside>
+
+    <main class="center-column">
+
+        <section class="welcome">
+            <div class="eyebrow">Your Progress · Your Contribution</div>
+            <h1 id="welcomeTitle">Credit History 🪙</h1>
+            <p>
+                Track your Skill Credits as you learn from other students
+                and share your own knowledge. Every completed exchange
+                helps you grow your skills and your learning community.
+            </p>
+        </section>
+
+        <h2 class="section-title">Your Credit Overview</h2>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Current Balance</div>
+                <div class="value" id="currentBalance">—</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Credits Earned</div>
+                <div class="value earned" id="creditsEarned">—</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Credits Spent</div>
+                <div class="value spent" id="creditsSpent">—</div>
+            </div>
+        </div>
+
+        <section class="content-section">
+
+            <div class="section-heading">
+                <h2>Transaction History 📊</h2>
+
+                <button class="action-button" id="refreshButton" type="button">
+                    ↻ Refresh
+                </button>
+            </div>
+
+            <p class="section-description">
+                Review your credit transactions, including credits earned
+                by teaching, credits spent on learning, and recorded connections.
+            </p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Transaction</th>
+                            <th>Credits</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="transactionRows">
+                        <tr>
+                            <td colspan="4" class="message">
+                                Loading transactions...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="page-message" id="pageMessage" aria-live="polite"></p>
+        </section>
+
+    </main>
+
+    <aside class="right-sidebar">
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">🪙</div>
+            <h3>How Skill Credits Work</h3>
+            <p>
+                Skill Credits help balance learning and teaching.
+                Completing an eligible exchange spends a credit for the learner
+                and rewards a credit to the student who teaches.
+            </p>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">📈</div>
+            <h3>Build Your Balance</h3>
+            <p>
+                Share your knowledge with other students. Teaching skills
+                through completed exchanges can help you earn Skill Credits.
+            </p>
+
+            <a class="action-button quick-link" href="/pages/my-skills.html">
+                Manage My Skills
+            </a>
+
+            <a class="action-button secondary quick-link" href="/pages/requests.html">
+                View Requests
+            </a>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">🎯</div>
+            <h3>Keep Learning</h3>
+            <p>
+                Find students who can teach you something new and keep
+                building your skills through peer learning.
+            </p>
+
+            <a class="action-button secondary quick-link" href="/pages/find-partners.html">
+                Find Partners
+            </a>
+        </section>
+
+    </aside>
+
+</div>
+
+<footer>SkillSync — Share Skills, Grow Together.</footer>
+
+<script>
+    const savedStudent = sessionStorage.getItem("skillsyncStudent");
+
+    function logout() {
+        sessionStorage.removeItem("skillsyncStudent");
+        window.location.href = "/pages/login.html";
+    }
+
+    document.getElementById("logoutButton").addEventListener(
+        "click",
+        function(event) {
+            event.preventDefault();
+            logout();
+        }
+    );
+
+    document.getElementById("headerLogoutButton").addEventListener(
+        "click",
+        logout
+    );
+
+    if (!savedStudent) {
+        window.location.replace("/pages/login.html");
+    } else {
+        try {
+            const student = JSON.parse(savedStudent);
+
+            const studentId =
+                student.studentId ??
+                student.student_id ??
+                student.id;
+
+            if (studentId == null) {
+                throw new Error(
+                    "Student ID was not found. Please sign in again."
+                );
+            }
+
+            document.getElementById("welcomeTitle").textContent =
+                `Credit History, ${student.fullName || student.name || "Student"} 🪙`;
+
+            async function loadCreditHistory() {
+                const rows = document.getElementById("transactionRows");
+                const message = document.getElementById("pageMessage");
+                const refreshButton = document.getElementById("refreshButton");
+
+                rows.replaceChildren();
+
+                const loadingRow = document.createElement("tr");
+                const loadingCell = document.createElement("td");
+
+                loadingCell.colSpan = 4;
+                loadingCell.className = "message";
+                loadingCell.textContent = "Loading transactions...";
+
+                loadingRow.appendChild(loadingCell);
+                rows.appendChild(loadingRow);
+
+                message.textContent = "";
+                refreshButton.disabled = true;
+
+                try {
+                    const [balanceResponse, historyResponse] =
+                        await Promise.all([
+                            fetch(
+                                `/api/credits?studentId=${encodeURIComponent(studentId)}`
+                            ),
+                            fetch(
+                                `/api/credit-history?studentId=${encodeURIComponent(studentId)}`
+                            )
+                        ]);
+
+                    if (!balanceResponse.ok || !historyResponse.ok) {
+                        throw new Error(
+                            "The credit history API could not be loaded."
+                        );
+                    }
+
+                    const balanceData = await balanceResponse.json();
+                    const historyData = await historyResponse.json();
+
+                    const balance = balanceData.skillCredits;
+
+                    document.getElementById("currentBalance").textContent =
+                        balance !== undefined && balance !== null
+                            ? balance
+                            : "—";
+
+                    const transactions = Array.isArray(historyData)
+                        ? historyData
+                        : (
+                            historyData.transactions ??
+                            historyData.history ??
+                            []
+                        );
+
+                    let earned = 0;
+                    let spent = 0;
+
+                    transactions.forEach(transaction => {
+                        const amount = Number(
+                            transaction.amount ??
+                            transaction.credits ??
+                            transaction.credit_change ??
+                            transaction.change_amount ??
+                            0
+                        );
+
+                        if (amount > 0) {
+                            earned += amount;
+                        }
+
+                        if (amount < 0) {
+                            spent += Math.abs(amount);
+                        }
+                    });
+
+                    document.getElementById("creditsEarned").textContent = earned;
+                    document.getElementById("creditsSpent").textContent = spent;
+
+                    rows.replaceChildren();
+
+                    if (transactions.length === 0) {
+                        const row = document.createElement("tr");
+                        const cell = document.createElement("td");
+
+                        cell.colSpan = 4;
+                        cell.className = "message";
+                        cell.textContent = "No credit transactions yet.";
+
+                        row.appendChild(cell);
+                        rows.appendChild(row);
+                        return;
+                    }
+
+                    transactions.forEach(transaction => {
+                        const rawAmount = Number(
+                            transaction.amount ??
+                            transaction.credits ??
+                            transaction.credit_change ??
+                            transaction.change_amount ??
+                            0
+                        );
+
+                        const skill = transaction.skill_name || "a skill";
+                        const person =
+                            transaction.other_student_name ||
+                            "your learning partner";
+
+                        const amount = Math.abs(rawAmount);
+                        let description;
+
+                        if (transaction.transaction_type === "Spent") {
+                            description =
+                                `Spent ${amount} Skill Credit${amount === 1 ? "" : "s"} on learning ${skill} from ${person}`;
+                        } else if (
+                            transaction.transaction_type === "Earned"
+                        ) {
+                            description =
+                                `Earned ${amount} Skill Credit${amount === 1 ? "" : "s"} by teaching ${skill} to ${person}`;
+                        } else if (
+                            transaction.transaction_type === "Connected"
+                        ) {
+                            description =
+                                `Connected with ${person} for ${skill}`;
+                        } else {
+                            description =
+                                transaction.description ||
+                                transaction.transaction_type ||
+                                "Credit transaction";
+                        }
+
+                        const dateValue =
+                            transaction.created_at ??
+                            transaction.transaction_date ??
+                            transaction.date ??
+                            null;
+
+                        const date = dateValue
+                            ? new Date(dateValue).toLocaleString()
+                            : "—";
+
+                        const type =
+                            transaction.transaction_type === "Connected"
+                                ? "Connected"
+                                : rawAmount > 0
+                                    ? "Earned"
+                                    : rawAmount < 0
+                                        ? "Spent"
+                                        : (
+                                            transaction.transaction_type ||
+                                            "Transaction"
+                                        );
+
+                        const row = document.createElement("tr");
+
+                        const dateCell = document.createElement("td");
+                        dateCell.textContent = date;
+
+                        const typeCell = document.createElement("td");
+                        const typeBadge = document.createElement("span");
+
+                        typeBadge.className =
+                            "transaction-type " + type.toLowerCase();
+
+                        typeBadge.textContent = type;
+                        typeCell.appendChild(typeBadge);
+
+                        const amountCell = document.createElement("td");
+
+                        amountCell.textContent =
+                            `${rawAmount > 0 ? "+" : ""}${rawAmount}`;
+
+                        amountCell.className =
+                            rawAmount > 0
+                                ? "credit-earned"
+                                : rawAmount < 0
+                                    ? "credit-spent"
+                                    : "";
+
+                        const descriptionCell = document.createElement("td");
+                        descriptionCell.textContent = description;
+
+                        row.append(
+                            dateCell,
+                            typeCell,
+                            amountCell,
+                            descriptionCell
+                        );
+
+                        rows.appendChild(row);
+                    });
+
+                } catch (error) {
+                    console.error("Error loading credit history:", error);
+
+                    rows.replaceChildren();
+
+                    const row = document.createElement("tr");
+                    const cell = document.createElement("td");
+
+                    cell.colSpan = 4;
+                    cell.className = "message";
+                    cell.textContent = "Unable to load credit history.";
+
+                    row.appendChild(cell);
+                    rows.appendChild(row);
+
+                    message.textContent =
+                        error.message +
+                        " Please check the existing API routes.";
+                } finally {
+                    refreshButton.disabled = false;
+                }
+            }
+
+            document.getElementById("refreshButton")
+                .addEventListener("click", loadCreditHistory);
+
+            loadCreditHistory();
+
+        } catch (error) {
+            console.error("Unable to identify student:", error);
+
+            document.getElementById("currentBalance").textContent = "—";
+            document.getElementById("creditsEarned").textContent = "—";
+            document.getElementById("creditsSpent").textContent = "—";
+
+            const rows = document.getElementById("transactionRows");
+            rows.replaceChildren();
+
+            const row = document.createElement("tr");
+            const cell = document.createElement("td");
+
+            cell.colSpan = 4;
+            cell.className = "message";
+            cell.textContent =
+                "Unable to identify the logged-in student.";
+
+            row.appendChild(cell);
+            rows.appendChild(row);
+
+            document.getElementById("pageMessage").textContent =
+                error.message;
+        }
+    }
+</script>
+
+</body>
+</html>

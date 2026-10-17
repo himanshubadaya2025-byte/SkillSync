@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillSync helps students exchange skills, find learning partners, and grow together through peer learning.">
 
-    <title>SkillSync — A Student Skill Exchange & Peer Learning Platform</title>
+    <title>SkillSync — Student Skill Exchange & Peer Learning</title>
 
     <style>
         * {
@@ -13,18 +14,27 @@
             box-sizing: border-box;
         }
 
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 85px;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background: #f8faff;
             color: #172033;
+            line-height: 1.6;
         }
 
         nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 22px 8%;
-            background: white;
+            padding: 18px 8%;
+            background: rgba(255, 255, 255, 0.96);
             border-bottom: 1px solid #e8edf5;
         }
 
@@ -32,6 +42,7 @@
             font-size: 27px;
             font-weight: bold;
             color: #4f46e5;
+            text-decoration: none;
         }
 
         .nav-links {
@@ -46,46 +57,61 @@
             font-size: 15px;
         }
 
+        .nav-links a:hover {
+            color: #4f46e5;
+        }
+
         .nav-links .login {
-            padding: 10px 20px;
+            padding: 9px 19px;
             border: 1px solid #4f46e5;
             border-radius: 8px;
             color: #4f46e5;
         }
 
+        .nav-links .register {
+            padding: 10px 19px;
+            border-radius: 8px;
+            background: #4f46e5;
+            color: white;
+        }
+
         .hero {
-            min-height: 590px;
+            min-height: 600px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 50px;
-            padding: 70px 8%;
+            gap: 55px;
+            padding: 75px 8%;
+            background:
+                radial-gradient(circle at 85% 25%, #e9e8ff 0, transparent 32%),
+                #f8faff;
         }
 
         .hero-content {
-            max-width: 570px;
+            max-width: 590px;
         }
-        .project-subtitle {
-    color: #4f46e5;
-    font-size: 15px;
-    font-weight: bold;
-    line-height: 1.6;
-    margin-bottom: 18px;
-}
 
         .badge {
             display: inline-block;
             background: #e9e8ff;
             color: #4f46e5;
-            padding: 9px 15px;
+            padding: 8px 15px;
             border-radius: 30px;
             font-size: 13px;
-            margin-bottom: 25px;
+            font-weight: bold;
+            margin-bottom: 22px;
+        }
+
+        .project-subtitle {
+            color: #4f46e5;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 14px;
         }
 
         h1 {
-            font-size: 55px;
-            line-height: 1.15;
+            font-size: clamp(38px, 5vw, 58px);
+            line-height: 1.13;
             margin-bottom: 22px;
             letter-spacing: -1.5px;
         }
@@ -94,30 +120,37 @@
             color: #4f46e5;
         }
 
-        .hero-content p {
+        .hero-content > p:not(.project-subtitle) {
             color: #64748b;
-            font-size: 17px;
-            line-height: 1.8;
-            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.9;
+            margin-bottom: 28px;
         }
 
         .buttons {
             display: flex;
-            gap: 15px;
+            gap: 14px;
             flex-wrap: wrap;
         }
 
         .btn {
-            padding: 14px 22px;
+            display: inline-block;
+            padding: 13px 22px;
             border-radius: 9px;
             text-decoration: none;
             font-weight: bold;
             font-size: 14px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
         }
 
         .primary {
             background: #4f46e5;
             color: white;
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.2);
         }
 
         .secondary {
@@ -127,33 +160,40 @@
         }
 
         .hero-card {
-            width: 370px;
-            min-height: 330px;
-            padding: 30px;
-            border-radius: 24px;
+            width: 390px;
+            flex-shrink: 0;
+            padding: 28px;
+            border: 1px solid #edf0f7;
+            border-radius: 22px;
             background: white;
             box-shadow: 0 20px 60px rgba(40, 50, 100, 0.10);
         }
 
         .hero-card h2 {
             font-size: 21px;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
         }
 
         .hero-card > p {
             color: #64748b;
             font-size: 14px;
-            margin-bottom: 25px;
+            margin-bottom: 22px;
         }
 
         .skill {
             display: flex;
             align-items: center;
             gap: 14px;
-            padding: 15px;
-            margin-bottom: 13px;
+            padding: 14px;
+            margin-bottom: 12px;
             border: 1px solid #edf0f7;
             border-radius: 12px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .skill:hover {
+            border-color: #c7c5ff;
+            transform: translateX(3px);
         }
 
         .skill-icon {
@@ -165,11 +205,12 @@
             border-radius: 10px;
             background: #eeedff;
             font-size: 21px;
+            flex-shrink: 0;
         }
 
         .skill h3 {
             font-size: 15px;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .skill p {
@@ -179,108 +220,256 @@
 
         .section {
             text-align: center;
-            padding: 65px 8%;
-            background: white;
+            padding: 75px 8%;
+        }
+
+        .section-heading {
+            max-width: 650px;
+            margin: 0 auto 38px;
+        }
+
+        .eyebrow {
+            color: #4f46e5;
+            font-size: 12px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }
 
         .section h2 {
             font-size: 32px;
+            line-height: 1.3;
             margin-bottom: 12px;
         }
 
-        .section > p {
+        .section-heading > p:last-child {
             color: #64748b;
-            margin-bottom: 35px;
-            line-height: 1.7;
+            font-size: 15px;
         }
 
         .features {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 22px;
+            text-align: left;
         }
 
         .feature {
-            text-align: left;
-            padding: 25px;
+            padding: 27px;
             border: 1px solid #e8edf5;
-            border-radius: 15px;
+            border-radius: 16px;
+            background: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .feature:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 35px rgba(40, 50, 100, 0.07);
         }
 
         .feature .icon {
-            font-size: 27px;
-            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 49px;
+            height: 49px;
+            border-radius: 12px;
+            background: #eeedff;
+            font-size: 25px;
+            margin-bottom: 18px;
         }
 
         .feature h3 {
-            margin-bottom: 12px;
+            font-size: 18px;
+            margin-bottom: 10px;
         }
 
         .feature p {
             color: #64748b;
             font-size: 14px;
-            line-height: 1.7;
+            line-height: 1.8;
+        }
+
+        .how-section {
+            background: white;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 25px;
+        }
+
+        .step {
+            padding: 15px;
+        }
+
+        .step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .step h3 {
+            margin-bottom: 9px;
+            font-size: 17px;
+        }
+
+        .step p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .credits-section {
+            padding: 65px 8%;
+            background: #f0efff;
+            text-align: center;
+        }
+
+        .credits-section h2 {
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .credits-section p {
+            max-width: 680px;
+            margin: 0 auto 24px;
+            color: #5b6477;
+            line-height: 1.8;
+        }
+
+        .credits-pill {
+            display: inline-block;
+            background: white;
+            color: #4f46e5;
+            padding: 10px 17px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .cta-section {
+            padding: 65px 8%;
+            text-align: center;
+            background: white;
+        }
+
+        .cta-section h2 {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .cta-section p {
+            color: #64748b;
+            margin-bottom: 24px;
         }
 
         footer {
-            text-align: center;
-            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            padding: 25px 8%;
             background: #f8faff;
+            border-top: 1px solid #e8edf5;
             color: #64748b;
             font-size: 13px;
         }
 
-        @media (max-width: 850px) {
+        footer a {
+            color: #4f46e5;
+            text-decoration: none;
+        }
+
+        @media (max-width: 900px) {
             .hero {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 40px;
             }
 
             .hero-card {
                 width: 100%;
-                max-width: 430px;
+                max-width: 480px;
             }
 
-            h1 {
-                font-size: 43px;
-            }
-
-            .features {
+            .features,
+            .steps {
                 grid-template-columns: 1fr;
             }
 
-            .nav-links {
-                gap: 12px;
-            }
-
-            .nav-links a {
-                font-size: 13px;
+            .feature {
+                max-width: 600px;
+                width: 100%;
+                margin: 0 auto;
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 560px) {
             nav {
-                padding: 18px 5%;
+                padding: 16px 5%;
+                gap: 12px;
             }
 
             .logo {
-                font-size: 22px;
+                font-size: 23px;
             }
 
-            .nav-links a:not(.login) {
+            .nav-links {
+                gap: 10px;
+            }
+
+            .nav-links a:not(.login):not(.register) {
                 display: none;
             }
 
+            .nav-links .login,
+            .nav-links .register {
+                padding: 8px 11px;
+                font-size: 12px;
+            }
+
             .hero {
+                min-height: auto;
                 padding: 55px 6%;
             }
 
-            h1 {
-                font-size: 37px;
+            .project-subtitle {
+                font-size: 12px;
+            }
+
+            .section {
+                padding: 55px 6%;
+            }
+
+            .section h2,
+            .cta-section h2 {
+                font-size: 27px;
             }
 
             .hero-card {
-                padding: 22px;
+                padding: 21px;
+            }
+
+            .credits-section,
+            .cta-section {
+                padding: 50px 6%;
+            }
+
+            footer {
+                justify-content: center;
+                text-align: center;
+                padding: 22px 6%;
             }
         }
     </style>
@@ -289,118 +478,215 @@
 <body>
 
     <nav>
-        <div class="logo">SkillSync.</div>
+        <a href="#home" class="logo">SkillSync.</a>
 
         <div class="nav-links">
             <a href="#home">Home</a>
             <a href="#how-it-works">How It Works</a>
             <a href="#features">Features</a>
-           <a href="/pages/login.html" class="login">Login</a>
+            <a href="/pages/login.html" class="login">Login</a>
+            <a href="/pages/register.html" class="register">Get Started</a>
         </div>
     </nav>
 
-    <section class="hero" id="home">
+    <main>
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <div class="badge">✦ A smarter way to learn together</div>
 
-        <div class="hero-content">
-          <div class="badge">✦ A smarter way to learn together</div>
+                <p class="project-subtitle">
+                    A Student Skill Exchange &amp; Peer Learning Platform
+                </p>
 
-<p class="project-subtitle">
-    A Student Skill Exchange & Peer Learning Platform
-</p>
+                <h1>
+                    Your skills.<br>
+                    Their knowledge.<br>
+                    <span>One community.</span>
+                </h1>
 
-<h1>
-    Your skills.<br>
-    Their knowledge.<br>
-    <span>One community.</span>
-</h1>
+                <p>
+                    Everyone knows something worth sharing. Discover talented
+                    students, exchange skills, and learn something new.
+                    Teach what you know and learn what you love with SkillSync.
+                </p>
 
+                <div class="buttons">
+                    <a href="/pages/register.html" class="btn primary">
+                        Get Started →
+                    </a>
+
+                    <a href="#how-it-works" class="btn secondary">
+                        Explore Platform
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-card">
+                <h2>Discover Skills ✨</h2>
+                <p>Find students who can help you grow.</p>
+
+                <div class="skill">
+                    <div class="skill-icon">💻</div>
+                    <div>
+                        <h3>Web Development</h3>
+                        <p>Learn • Build • Create</p>
+                    </div>
+                </div>
+
+                <div class="skill">
+                    <div class="skill-icon">🎨</div>
+                    <div>
+                        <h3>UI/UX Design</h3>
+                        <p>Design • Imagine • Innovate</p>
+                    </div>
+                </div>
+
+                <div class="skill">
+                    <div class="skill-icon">🐍</div>
+                    <div>
+                        <h3>Python Programming</h3>
+                        <p>Code • Practice • Improve</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section how-section" id="how-it-works">
+            <div class="section-heading">
+                <p class="eyebrow">How it works</p>
+                <h2>Learning is better together.</h2>
+                <p>
+                    Everyone has something to teach and something to learn.
+                    SkillSync helps you connect the two in a simple way.
+                </p>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Create Your Profile</h3>
+                    <p>
+                        Sign up and tell the community which skills you can
+                        teach and which ones you want to learn.
+                    </p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Find Your Learning Partner</h3>
+                    <p>
+                        Explore matching skills, discover other students,
+                        and send an exchange request.
+                    </p>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Exchange Knowledge</h3>
+                    <p>
+                        Connect with your partner, complete your learning
+                        session, and participate in a community of learners.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="features">
+            <div class="section-heading">
+                <p class="eyebrow">Why SkillSync?</p>
+                <h2>Everything you need to learn together.</h2>
+                <p>
+                    A student-focused platform designed to make sharing
+                    knowledge and discovering new skills easier.
+                </p>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="icon">🎯</div>
+                    <h3>Share Your Skills</h3>
+                    <p>
+                        Add the skills you know and help other students learn
+                        through peer-to-peer knowledge sharing.
+                    </p>
+                </div>
+
+                <div class="feature">
+                    <div class="icon">🤝</div>
+                    <h3>Find Learning Partners</h3>
+                    <p>
+                        Discover students who can teach skills you want to
+                        learn and connect through exchange requests.
+                    </p>
+                </div>
+
+                <div class="feature">
+                    <div class="icon">📚</div>
+                    <h3>Track Your Exchanges</h3>
+                    <p>
+                        Keep track of incoming and outgoing requests and
+                        manage your accepted learning partnerships.
+                    </p>
+                </div>
+
+                <div class="feature">
+                    <div class="icon">🪙</div>
+                    <h3>Skill Credit System</h3>
+                    <p>
+                        Start with two Skill Credits. Completing a learning
+                        exchange transfers one credit from the learner to
+                        the student who teaches.
+                    </p>
+                </div>
+
+                <div class="feature">
+                    <div class="icon">🔔</div>
+                    <h3>Stay Updated</h3>
+                    <p>
+                        Keep up with your skill exchange requests and their
+                        status through platform notifications.
+                    </p>
+                </div>
+
+                <div class="feature">
+                    <div class="icon">📈</div>
+                    <h3>Grow Together</h3>
+                    <p>
+                        Practice useful skills, learn from fellow students,
+                        and build your knowledge through collaboration.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="credits-section">
+            <h2>Knowledge is valuable. Share it.</h2>
             <p>
-                Discover talented students, exchange skills, and learn
-                something new. Teach what you know and learn what you love
-                with SkillSync.
+                SkillSync uses a simple Skill Credit system to support
+                learning exchanges. New students receive two starter credits.
+                When an exchange is completed, one credit moves from the
+                learner to the student who taught the skill.
+            </p>
+            <span class="credits-pill">Learn • Teach • Exchange • Repeat</span>
+        </section>
+
+        <section class="cta-section">
+            <h2>Ready to discover what you can learn?</h2>
+            <p>
+                Join SkillSync and start connecting with students who share
+                your interests.
             </p>
 
-            <div class="buttons">
-                <a href="#" class="btn primary">Get Started →</a>
-                <a href="#how-it-works" class="btn secondary">
-                    Explore Platform
-                </a>
-            </div>
-        </div>
+            <a href="/pages/register.html" class="btn primary">
+                Create Your Account →
+            </a>
+        </section>
+    </main>
 
-        <div class="hero-card">
-            <h2>Discover Skills ✨</h2>
-            <p>Find students who can help you grow.</p>
-
-            <div class="skill">
-                <div class="skill-icon">💻</div>
-                <div>
-                    <h3>Web Development</h3>
-                    <p>Learn • Build • Create</p>
-                </div>
-            </div>
-
-            <div class="skill">
-                <div class="skill-icon">🎨</div>
-                <div>
-                    <h3>UI/UX Design</h3>
-                    <p>Design • Imagine • Innovate</p>
-                </div>
-            </div>
-
-            <div class="skill">
-                <div class="skill-icon">🐍</div>
-                <div>
-                    <h3>Python Programming</h3>
-                    <p>Code • Practice • Improve</p>
-                </div>
-            </div>
-        </div>
-
-    </section>
-
-    <section class="section" id="how-it-works">
-        <h2>Learning is better together.</h2>
-
-        <p>
-            Everyone has something to teach and something to learn.
-            SkillSync helps you connect the two.
-        </p>
-
-        <div class="features">
-
-            <div class="feature">
-                <div class="icon">🎯</div>
-                <h3>Share Your Skills</h3>
-                <p>
-                    Add the skills you know and help other students
-                    learn through peer-to-peer knowledge sharing.
-                </p>
-            </div>
-
-            <div class="feature">
-                <div class="icon">🤝</div>
-                <h3>Find Your Match</h3>
-                <p>
-                    Discover students whose skills match your learning
-                    interests and exchange knowledge.
-                </p>
-            </div>
-
-            <div class="feature">
-                <div class="icon">🚀</div>
-                <h3>Grow Together</h3>
-                <p>
-                    Send exchange requests, collaborate with peers,
-                    and develop practical skills together.
-                </p>
-            </div>
-
-        </div>
-    </section>
-
-    <footer id="features">
-        © 2026 SkillSync | Learn Together. Grow Together.
+    <footer>
+        <a href="#home" class="logo">SkillSync.</a>
+        <p>© 2026 SkillSync | Learn Together. Grow Together.</p>
+        <a href="/pages/login.html">Already a member? Log in</a>
     </footer>
 
 </body>

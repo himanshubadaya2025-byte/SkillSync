@@ -284,8 +284,117 @@ app.get("/api/credits", (req, res) => {
         });
     });
 });
+// Get credit transaction and connection history for a student
+app.get("/api/credit-history", (req, res) => {
+    const studentId = Number(req.query.studentId);
 
+    if (!Number.isInteger(studentId) || studentId <= 0) {
+        return res.status(400).json({
+            message: "A valid student ID is required."
+        });
+    }
 
+    const sql = `
+        SELECT *
+        FROM (
+            SELECT
+                ct.transaction_id,
+                ct.amount,
+                ct.transaction_type,
+                ct.description,
+                ct.created_at,
+                ct.exchange_request_id,
+                er.skill_id,
+                sk.skill_name,
+                er.accepted_at,
+                CASE
+                    WHEN ct.transaction_type = 'Spent'
+                        THEN teacher.full_name
+                    WHEN ct.transaction_type = 'Earned'
+                        THEN learner.full_name
+                    ELSE NULL
+                END AS other_student_name,
+                CASE
+                    WHEN ct.transaction_type = 'Spent'
+                        THEN teacher.email
+                    WHEN ct.transaction_type = 'Earned'
+                        THEN learner.email
+                    ELSE NULL
+                END AS other_student_email
+            FROM credit_transactions ct
+            LEFT JOIN exchange_requests er
+                ON ct.exchange_request_id = er.request_id
+            LEFT JOIN skills sk
+                ON er.skill_id = sk.skill_id
+            LEFT JOIN students learner
+                ON er.requester_id = learner.student_id
+            LEFT JOIN students teacher
+                ON er.receiver_id = teacher.student_id
+            WHERE ct.student_id = ?
+
+            UNION ALL
+
+            SELECT
+                NULL AS transaction_id,
+                0 AS amount,
+                'Connected' AS transaction_type,
+                'Connected with a learning partner' AS description,
+                er.accepted_at AS created_at,
+                er.request_id AS exchange_request_id,
+                er.skill_id,
+                sk.skill_name,
+                er.accepted_at,
+                CASE
+                    WHEN er.requester_id = ?
+                        THEN contact.full_name
+                    ELSE requester.full_name
+                END AS other_student_name,
+                CASE
+                    WHEN er.requester_id = ?
+                        THEN contact.email
+                    ELSE requester.email
+                END AS other_student_email
+            FROM exchange_requests er
+            JOIN skills sk
+                ON er.skill_id = sk.skill_id
+            JOIN students contact
+                ON contact.student_id = CASE
+                    WHEN er.requester_id = ?
+                        THEN er.receiver_id
+                    ELSE er.requester_id
+                END
+            JOIN students requester
+                ON requester.student_id = er.requester_id
+            WHERE (er.requester_id = ? OR er.receiver_id = ?)
+              AND er.status IN ('Accepted', 'Completed')
+              AND er.accepted_at IS NOT NULL
+        ) AS history
+        ORDER BY created_at DESC, transaction_id DESC
+    `;
+
+    db.query(
+        sql,
+        [
+            studentId,
+            studentId,
+            studentId,
+            studentId,
+            studentId,
+            studentId
+        ],
+        (err, results) => {
+            if (err) {
+                console.error("Credit history error:", err.message);
+
+                return res.status(500).json({
+                    message: "Unable to load credit history."
+                });
+            }
+
+            return res.json(results);
+        }
+    );
+});
 
 // Get skills that the logged-in student can teach
 app.get("/api/my-skills", (req, res) => {
@@ -968,16 +1077,20 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
     // Accepting or rejecting a pending request
     if (newStatus !== "Completed") {
         const sql = `
-            UPDATE exchange_requests
-            SET status = ?
-            WHERE request_id = ?
-              AND receiver_id = ?
-              AND status = 'Pending'
-        `;
+    UPDATE exchange_requests
+    SET status = ?,
+        accepted_at = CASE
+            WHEN ? = 'Accepted' THEN CURRENT_TIMESTAMP
+            ELSE accepted_at
+        END
+    WHERE request_id = ?
+      AND receiver_id = ?
+      AND status = 'Pending'
+`;
 
         return db.query(
             sql,
-            [newStatus, requestId, studentId],
+            [newStatus, newStatus, requestId, studentId],
             (err, result) => {
                 if (err) {
                     console.error("Request status update error:", err.message);
@@ -1318,4 +1431,48 @@ app.router.stack.forEach((layer) => {
 // Start server
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`SkillSync server running on port ${PORT}`);
+});
+// Get accepted learning partners for a student
+app.get("/api/accepted-contacts", (req, res) => {
+    const studentId = Number(req.query.studentId);
+
+    if (!Number.isInteger(studentId) || studentId <= 0) {
+        return res.status(400).json({
+            message: "A valid student ID is required."
+        });
+    }
+
+    const sql = `
+        SELECT
+            er.request_id,
+            er.skill_id,
+            er.status,
+            s.student_id AS contact_id,
+            s.full_name AS contact_name,
+            s.email AS contact_email,
+            s.department AS contact_department,
+            sk.skill_name
+        FROM exchange_requests er
+        JOIN students s
+            ON s.student_id = CASE
+                WHEN er.requester_id = ? THEN er.receiver_id
+                ELSE er.requester_id
+            END
+        JOIN skills sk
+            ON sk.skill_id = er.skill_id
+        WHERE
+            (er.requester_id = ? OR er.receiver_id = ?)
+            AND er.status = 'Accepted'
+    `;
+
+    db.query(sql, [studentId, studentId, studentId], (err, results) => {
+        if (err) {
+            console.error("Accepted contacts error:", err.message);
+            return res.status(500).json({
+                message: "Unable to load learning partners."
+            });
+        }
+
+        return res.json(results);
+    });
 });

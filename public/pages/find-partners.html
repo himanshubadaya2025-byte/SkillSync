@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Partners | SkillSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            height: 68px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: #4f46e5;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .header-logout {
+            border: none;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 10px 16px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .header-logout:hover {
+            background: #e0e7ff;
+        }
+
+        .dashboard-layout {
+            max-width: 1500px;
+            margin: 24px auto 36px;
+            padding: 0 22px;
+            display: grid;
+            grid-template-columns: 205px minmax(0, 1fr) 315px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .left-sidebar {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px 12px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .sidebar-heading {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 10px;
+            margin: 8px 0 10px;
+        }
+
+        .nav-button {
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            color: #475569;
+            padding: 11px 10px;
+            margin-bottom: 4px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .nav-button.logout {
+            color: #dc2626;
+            margin-top: 12px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            text-align: left;
+        }
+
+        .nav-button.logout:hover {
+            background: #fef2f2;
+        }
+
+        .center-column {
+            min-width: 0;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 22px;
+        }
+
+        .welcome .eyebrow {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+
+        .welcome h1 {
+            font-size: 29px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .welcome p {
+            font-size: 14px;
+            line-height: 1.7;
+            opacity: 0.95;
+            max-width: 650px;
+        }
+
+        .section-title {
+            font-size: 19px;
+            margin: 26px 0 14px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 19px;
+            min-width: 0;
+        }
+
+        .summary-card .label {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .summary-card .value {
+            color: #4f46e5;
+            font-size: 27px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .content-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 22px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .section-heading h2 {
+            font-size: 19px;
+        }
+
+        .section-description {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+            margin: -7px 0 18px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .search-form input {
+            flex: 1;
+            min-width: 0;
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dbe1ed;
+            border-radius: 9px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-form input:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px #eef2ff;
+        }
+
+        .action-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 17px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .action-button:hover {
+            background: #3730a3;
+        }
+
+        .action-button.secondary {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .action-button.secondary:hover {
+            background: #e0e7ff;
+        }
+
+        .partner-list {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .partner-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px;
+            background: white;
+            min-width: 0;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .partner-card:hover {
+            border-color: #c7d2fe;
+            box-shadow: 0 4px 14px #4f46e50d;
+        }
+
+        .partner-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: #eef2ff;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            margin-bottom: 13px;
+        }
+
+        .partner-card h3 {
+            color: #334155;
+            font-size: 16px;
+            margin-bottom: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .skill-label {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .skill-value {
+            display: inline-block;
+            background: #eef2ff;
+            color: #4338ca;
+            border-radius: 7px;
+            padding: 6px 9px;
+            font-size: 12px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+            max-width: 100%;
+        }
+
+        .message {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.8;
+            grid-column: 1 / -1;
+        }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .right-sidebar-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 21px;
+        }
+
+        .right-sidebar-card h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .right-sidebar-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .tip-icon {
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .quick-link {
+            display: block;
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            padding: 8px 20px 24px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-layout {
+                grid-template-columns: 190px minmax(0, 1fr);
+            }
+
+            .right-sidebar {
+                grid-column: 2;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .left-sidebar {
+                position: static;
+            }
+
+            .right-sidebar {
+                grid-column: 1;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 0 16px;
+            }
+
+            .dashboard-layout {
+                margin-top: 16px;
+                padding: 0 14px;
+                gap: 16px;
+            }
+
+            .left-sidebar {
+                padding: 16px 12px;
+            }
+
+            .left-sidebar nav {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 4px;
+            }
+
+            .sidebar-heading {
+                grid-column: 1 / -1;
+            }
+
+            .nav-button {
+                font-size: 12px;
+                padding: 10px 8px;
+            }
+
+            .nav-button.logout {
+                margin-top: 0;
+            }
+
+            .welcome {
+                padding: 23px;
+            }
+
+            .welcome h1 {
+                font-size: 25px;
+            }
+
+            .content-section {
+                padding: 19px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .summary-card {
+                padding: 15px;
+            }
+
+            .summary-card .value {
+                font-size: 23px;
+            }
+
+            .partner-list {
+                grid-template-columns: 1fr;
+            }
+
+            .right-sidebar {
+                grid-template-columns: 1fr;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+
+            .search-form input {
+                min-height: 44px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .logo {
+                font-size: 22px;
+            }
+
+            .header-logout {
+                padding: 9px 11px;
+                font-size: 12px;
+            }
+
+            .welcome h1 {
+                font-size: 22px;
+            }
+
+            .content-section {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillSync.</div>
+    <button class="header-logout" id="headerLogoutButton">Log Out</button>
+</header>
+
+<div class="dashboard-layout">
+
+    <aside class="left-sidebar">
+        <div class="sidebar-heading">Workspace</div>
+
+        <nav>
+            <a class="nav-button" href="/pages/dashboard-redesigned.html">🏠 Home</a>
+            <a class="nav-button" href="/pages/my-skills.html">🧠 My Skills</a>
+            <a class="nav-button" href="/pages/learn-skills.html">🎯 Learn Skills</a>
+            <a class="nav-button active" href="/pages/find-partners.html">🤝 Find Partners</a>
+            <a class="nav-button" href="/pages/requests.html">📩 Requests</a>
+            <a class="nav-button" href="/pages/partners.html">👥 Partners</a>
+
+            <div class="sidebar-heading">Account</div>
+
+            <a class="nav-button" href="/pages/profile.html">👤 My Profile</a>
+            <a class="nav-button" href="/pages/credit-history.html">🪙 Credit History</a>
+            <a class="nav-button" href="/pages/notifications.html">🔔 Notifications</a>
+
+            <a class="nav-button logout" href="#" id="logoutButton">🚪 Log Out</a>
+        </nav>
+    </aside>
+
+    <main class="center-column">
+
+        <section class="welcome">
+            <div class="eyebrow">Learn Together · Grow Together</div>
+            <h1 id="welcomeTitle">Find Your Learning Partners 🤝</h1>
+            <p>
+                Discover students who can teach you new skills and find people
+                who share your learning interests. Your next learning partner
+                could be just one search away.
+            </p>
+        </section>
+
+        <h2 class="section-title">Your Partner Discovery</h2>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Suggested Partners</div>
+                <div class="value" id="partnerCount">—</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Matching Skills</div>
+                <div class="value" id="matchingSkillCount">—</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Search Status</div>
+                <div class="value" id="searchStatus" style="font-size:17px;">Ready</div>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>Search for a Skill 🔎</h2>
+            </div>
+
+            <p class="section-description">
+                Search by student name or skill name to narrow down the
+                suggested partners shown below.
+            </p>
+
+            <form id="searchForm" class="search-form">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Try Python, Java, Web Development..."
+                    aria-label="Search students and skills"
+                >
+
+                <button class="action-button" type="submit">Search Partners</button>
+                <button class="action-button secondary" type="button" id="resetSearchButton">
+                    Show All
+                </button>
+            </form>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>Suggested Partners 👥</h2>
+                <span id="resultsLabel" style="color:#64748b;font-size:12px;"></span>
+            </div>
+
+            <div id="partnerList" class="partner-list">
+                <p class="message">Loading learning partners...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <aside class="right-sidebar">
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">💡</div>
+            <h3>Get Better Matches</h3>
+            <p>
+                Add the skills you can teach in My Skills and the skills you
+                want to learn in Learn Skills. Keeping both lists updated can
+                help SkillSync find more relevant matches.
+            </p>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">🎯</div>
+            <h3>Keep Exploring</h3>
+            <p>
+                Learning is easier when you connect with students who have
+                different strengths. Explore new skills and build your
+                learning network.
+            </p>
+
+            <a class="action-button quick-link" href="/pages/learn-skills.html">
+                Add Learning Goals
+            </a>
+
+            <a class="action-button secondary quick-link" href="/pages/my-skills.html">
+                Manage My Skills
+            </a>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">📩</div>
+            <h3>Already Connected?</h3>
+            <p>
+                Check your requests to see incoming learning requests and
+                respond to requests from other students.
+            </p>
+
+            <a class="action-button secondary quick-link" href="/pages/requests.html">
+                View Requests
+            </a>
+        </section>
+
+    </aside>
+
+</div>
+
+<footer>SkillSync — Share Skills, Grow Together.</footer>
+
+<script>
+    const student = JSON.parse(
+        sessionStorage.getItem("skillsyncStudent") || "null"
+    );
+
+    const partnerList = document.getElementById("partnerList");
+    const searchForm = document.getElementById("searchForm");
+    const searchInput = document.getElementById("searchInput");
+    const partnerCount = document.getElementById("partnerCount");
+    const matchingSkillCount = document.getElementById("matchingSkillCount");
+    const searchStatus = document.getElementById("searchStatus");
+    const resultsLabel = document.getElementById("resultsLabel");
+
+    if (!student || !student.studentId) {
+        window.location.href = "/pages/login.html";
+    }
+
+    document.getElementById("welcomeTitle").textContent =
+        `Find Partners, ${student.fullName || "Student"} 🤝`;
+
+    let partners = [];
+
+    function getPartnerSkill(partner) {
+        return (
+            partner.skill_name ||
+            partner.skill ||
+            partner.wanted_skill ||
+            partner.learning_skill ||
+            "Skill match"
+        );
+    }
+
+    function getPartnerName(partner) {
+        return (
+            partner.student_name ||
+            partner.name ||
+            partner.full_name ||
+            "Student"
+        );
+    }
+
+    function showMessage(text) {
+        partnerList.replaceChildren();
+
+        const message = document.createElement("p");
+        message.className = "message";
+        message.textContent = text;
+
+        partnerList.appendChild(message);
+    }
+
+    async function loadPartners() {
+        showMessage("Loading learning partners...");
+
+        partnerCount.textContent = "…";
+        matchingSkillCount.textContent = "…";
+        searchStatus.textContent = "Loading";
+
+        try {
+            const response = await fetch(
+                `/api/skill-matches?studentId=${encodeURIComponent(student.studentId)}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Could not load partners.");
+            }
+
+            partners = Array.isArray(data)
+                ? data
+                : (data.matches || data.partners || []);
+
+            const uniqueSkills = new Set(
+                partners.map(partner => getPartnerSkill(partner).toLowerCase())
+            );
+
+            partnerCount.textContent = partners.length;
+            matchingSkillCount.textContent = uniqueSkills.size;
+            searchStatus.textContent = "Ready";
+
+            renderPartners(partners);
+
+        } catch (error) {
+            console.error("Error loading partners:", error);
+
+            partnerCount.textContent = "—";
+            matchingSkillCount.textContent = "—";
+            searchStatus.textContent = "Error";
+
+            showMessage(
+                "Unable to load partner suggestions. Please try again later."
+            );
+        }
+    }
+
+    function renderPartners(list) {
+        partnerList.replaceChildren();
+
+        partnerCount.textContent = list.length;
+
+        const uniqueSkills = new Set(
+            list.map(partner => getPartnerSkill(partner).toLowerCase())
+        );
+
+        matchingSkillCount.textContent = uniqueSkills.size;
+        resultsLabel.textContent =
+            `${list.length} ${list.length === 1 ? "partner" : "partners"} found`;
+
+        if (!list.length) {
+            showMessage(
+                "No matching partners found. Try another search, or add skills you can teach and skills you want to learn to improve your suggestions."
+            );
+            return;
+        }
+
+        list.forEach(partner => {
+            const card = document.createElement("article");
+            card.className = "partner-card";
+
+            const avatar = document.createElement("div");
+            avatar.className = "partner-avatar";
+            avatar.textContent = "👤";
+
+            const name = document.createElement("h3");
+            name.textContent = getPartnerName(partner);
+
+            const label = document.createElement("p");
+            label.className = "skill-label";
+            label.textContent = "Matching skill";
+
+            const skill = document.createElement("span");
+            skill.className = "skill-value";
+            skill.textContent = getPartnerSkill(partner);
+
+            card.appendChild(avatar);
+            card.appendChild(name);
+            card.appendChild(label);
+            card.appendChild(skill);
+
+            partnerList.appendChild(card);
+        });
+    }
+
+    searchForm.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const query = searchInput.value.trim().toLowerCase();
+
+        if (!query) {
+            renderPartners(partners);
+            searchStatus.textContent = "Ready";
+            return;
+        }
+
+        const filtered = partners.filter(partner => {
+            const searchableText = [
+                getPartnerName(partner),
+                partner.skill_name,
+                partner.skill,
+                partner.wanted_skill,
+                partner.learning_skill
+            ].filter(Boolean).join(" ").toLowerCase();
+
+            return searchableText.includes(query);
+        });
+
+        searchStatus.textContent = "Filtered";
+        renderPartners(filtered);
+    });
+
+    document.getElementById("resetSearchButton").addEventListener("click", function() {
+        searchInput.value = "";
+        searchStatus.textContent = "Ready";
+        renderPartners(partners);
+    });
+
+    function logout() {
+        sessionStorage.removeItem("skillsyncStudent");
+        window.location.href = "/pages/login.html";
+    }
+
+    document.getElementById("logoutButton").addEventListener("click", function(event) {
+        event.preventDefault();
+        logout();
+    });
+
+    document.getElementById("headerLogoutButton").addEventListener("click", logout);
+
+    loadPartners();
+</script>
+
+</body>
+</html>
