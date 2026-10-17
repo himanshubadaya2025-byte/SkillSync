@@ -635,7 +635,114 @@
     </aside>
 
 </div>
+<!-- Send Skill Exchange Request Modal -->
+<div id="requestModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,0.55);
+    z-index:1000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+">
+    <div style="
+        background:white;
+        width:100%;
+        max-width:480px;
+        padding:28px;
+        border-radius:18px;
+        box-shadow:0 20px 60px rgba(0,0,0,0.2);
+    ">
+        <h2 style="color:#4f46e5;margin-bottom:8px;">
+            Send Skill Exchange Request 🤝
+        </h2>
 
+        <p style="color:#64748b;font-size:14px;margin-bottom:20px;">
+            Introduce yourself with one message. You cannot send
+            additional messages through this request.
+        </p>
+
+        <form id="requestForm">
+            <p style="margin-bottom:8px;font-weight:bold;font-size:14px;">
+                Sending request to
+            </p>
+
+            <p id="requestPartnerName"
+               style="margin-bottom:18px;color:#4f46e5;font-weight:bold;">
+            </p>
+
+            <label for="requestSkill"
+                   style="display:block;margin-bottom:7px;font-weight:bold;">
+                Skill
+            </label>
+
+            <input
+                type="text"
+                id="requestSkill"
+                readonly
+                style="
+                    width:100%;
+                    padding:12px;
+                    margin-bottom:18px;
+                    border:1px solid #dbe1ed;
+                    border-radius:9px;
+                    background:#f8faff;
+                "
+            >
+
+            <label for="requestMessage"
+                   style="display:block;margin-bottom:7px;font-weight:bold;">
+                Your Message
+            </label>
+
+            <textarea
+                id="requestMessage"
+                maxlength="255"
+                required
+                rows="4"
+                placeholder="Hi! I'd like to learn this skill from you..."
+                style="
+                    width:100%;
+                    padding:12px;
+                    border:1px solid #dbe1ed;
+                    border-radius:9px;
+                    resize:vertical;
+                    font-family:Arial,sans-serif;
+                    font-size:14px;
+                "
+            ></textarea>
+
+            <p style="text-align:right;color:#64748b;font-size:12px;margin-top:5px;">
+                <span id="messageCount">0</span>/255 characters
+            </p>
+
+            <p id="requestFormMessage"
+               style="font-size:13px;margin:12px 0;display:none;">
+            </p>
+
+            <div style="display:flex;gap:10px;margin-top:18px;">
+                <button
+                    type="submit"
+                    id="sendRequestButton"
+                    class="action-button"
+                    style="flex:1;"
+                >
+                    Send Request
+                </button>
+
+                <button
+                    type="button"
+                    id="cancelRequestButton"
+                    class="action-button secondary"
+                    style="flex:1;"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 <footer>SkillSync — Share Skills, Grow Together.</footer>
 
 <script>
@@ -671,13 +778,14 @@
     }
 
     function getPartnerName(partner) {
-        return (
-            partner.student_name ||
-            partner.name ||
-            partner.full_name ||
-            "Student"
-        );
-    }
+    return (
+        partner.student_name ||
+        partner.full_name ||
+        partner.name ||
+        partner.full_name ||
+        "Student"
+    );
+}
 
     function showMessage(text) {
         partnerList.replaceChildren();
@@ -734,53 +842,66 @@
         }
     }
 
-    function renderPartners(list) {
-        partnerList.replaceChildren();
+   function renderPartners(list) {
+    partnerList.replaceChildren();
 
-        partnerCount.textContent = list.length;
+    partnerCount.textContent = list.length;
 
-        const uniqueSkills = new Set(
-            list.map(partner => getPartnerSkill(partner).toLowerCase())
+    const uniqueSkills = new Set(
+        list.map(partner => getPartnerSkill(partner).toLowerCase())
+    );
+
+    matchingSkillCount.textContent = uniqueSkills.size;
+
+    resultsLabel.textContent =
+        `${list.length} ${list.length === 1 ? "partner" : "partners"} found`;
+
+    if (!list.length) {
+        showMessage(
+            "No matching partners found. Add skills you can teach and skills you want to learn to improve your suggestions."
+        );
+        return;
+    }
+
+    list.forEach(partner => {
+        const card = document.createElement("article");
+        card.className = "partner-card";
+
+        const avatar = document.createElement("div");
+        avatar.className = "partner-avatar";
+        avatar.textContent = "👤";
+
+        const name = document.createElement("h3");
+        name.textContent = getPartnerName(partner);
+
+        const label = document.createElement("p");
+        label.className = "skill-label";
+        label.textContent = "Matching skill";
+
+        const skill = document.createElement("span");
+        skill.className = "skill-value";
+        skill.textContent = getPartnerSkill(partner);
+
+        const requestButton = document.createElement("button");
+        requestButton.type = "button";
+        requestButton.className = "action-button quick-link";
+        requestButton.textContent = "Send Request";
+
+        requestButton.addEventListener("click", () => {
+            openRequestModal(partner, requestButton);
+        });
+
+        card.append(
+            avatar,
+            name,
+            label,
+            skill,
+            requestButton
         );
 
-        matchingSkillCount.textContent = uniqueSkills.size;
-        resultsLabel.textContent =
-            `${list.length} ${list.length === 1 ? "partner" : "partners"} found`;
-
-        if (!list.length) {
-            showMessage(
-                "No matching partners found. Try another search, or add skills you can teach and skills you want to learn to improve your suggestions."
-            );
-            return;
-        }
-
-        list.forEach(partner => {
-            const card = document.createElement("article");
-            card.className = "partner-card";
-
-            const avatar = document.createElement("div");
-            avatar.className = "partner-avatar";
-            avatar.textContent = "👤";
-
-            const name = document.createElement("h3");
-            name.textContent = getPartnerName(partner);
-
-            const label = document.createElement("p");
-            label.className = "skill-label";
-            label.textContent = "Matching skill";
-
-            const skill = document.createElement("span");
-            skill.className = "skill-value";
-            skill.textContent = getPartnerSkill(partner);
-
-            card.appendChild(avatar);
-            card.appendChild(name);
-            card.appendChild(label);
-            card.appendChild(skill);
-
-            partnerList.appendChild(card);
-        });
-    }
+        partnerList.appendChild(card);
+    });
+}
 
     searchForm.addEventListener("submit", function(event) {
         event.preventDefault();
@@ -809,12 +930,133 @@
         renderPartners(filtered);
     });
 
-    document.getElementById("resetSearchButton").addEventListener("click", function() {
-        searchInput.value = "";
-        searchStatus.textContent = "Ready";
-        renderPartners(partners);
-    });
+   let selectedPartner = null;
+let selectedRequestButton = null;
 
+const requestModal = document.getElementById("requestModal");
+const requestForm = document.getElementById("requestForm");
+const requestMessage = document.getElementById("requestMessage");
+const requestFormMessage = document.getElementById("requestFormMessage");
+const sendRequestButton = document.getElementById("sendRequestButton");
+
+function openRequestModal(partner, button) {
+    selectedPartner = partner;
+    selectedRequestButton = button;
+
+    document.getElementById("requestPartnerName").textContent =
+        getPartnerName(partner);
+
+    document.getElementById("requestSkill").value =
+        getPartnerSkill(partner);
+
+    requestMessage.value = "";
+    document.getElementById("messageCount").textContent = "0";
+
+    requestFormMessage.style.display = "none";
+    requestFormMessage.textContent = "";
+
+    sendRequestButton.disabled = false;
+    sendRequestButton.textContent = "Send Request";
+
+    requestModal.style.display = "flex";
+    requestMessage.focus();
+}
+
+function closeRequestModal() {
+    requestModal.style.display = "none";
+    requestForm.reset();
+
+    selectedPartner = null;
+    selectedRequestButton = null;
+}
+
+requestMessage.addEventListener("input", () => {
+    document.getElementById("messageCount").textContent =
+        requestMessage.value.length;
+});
+
+document.getElementById("cancelRequestButton").addEventListener(
+    "click",
+    closeRequestModal
+);
+
+requestModal.addEventListener("click", event => {
+    if (event.target === requestModal) {
+        closeRequestModal();
+    }
+});
+
+requestForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (!selectedPartner) {
+        return;
+    }
+
+    const message = requestMessage.value.trim();
+
+    if (!message) {
+        requestFormMessage.textContent =
+            "Please write a short message before sending.";
+        requestFormMessage.style.color = "#dc2626";
+        requestFormMessage.style.display = "block";
+        return;
+    }
+
+    const receiverId = Number(selectedPartner.student_id);
+    const skillId = Number(selectedPartner.skill_id);
+
+    if (!receiverId || !skillId) {
+        requestFormMessage.textContent =
+            "The partner or skill information is missing. Please refresh the page and try again.";
+        requestFormMessage.style.color = "#dc2626";
+        requestFormMessage.style.display = "block";
+        return;
+    }
+
+    sendRequestButton.disabled = true;
+    sendRequestButton.textContent = "Sending...";
+
+    try {
+        const response = await fetch("/api/exchange-requests", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                requesterId: Number(student.studentId),
+                receiverId: receiverId,
+                skillId: skillId,
+                message: message
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Unable to send the request."
+            );
+        }
+
+        alert("Skill exchange request sent successfully!");
+
+        if (selectedRequestButton) {
+            selectedRequestButton.textContent = "Request Sent";
+            selectedRequestButton.disabled = true;
+        }
+
+        closeRequestModal();
+
+    } catch (error) {
+        requestFormMessage.textContent = error.message;
+        requestFormMessage.style.color = "#dc2626";
+        requestFormMessage.style.display = "block";
+
+        sendRequestButton.disabled = false;
+        sendRequestButton.textContent = "Send Request";
+    }
+});
     function logout() {
         sessionStorage.removeItem("skillsyncStudent");
         window.location.href = "/pages/login.html";

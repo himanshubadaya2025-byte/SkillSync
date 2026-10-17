@@ -644,8 +644,13 @@ app.post("/api/exchange-requests", (req, res) => {
     const requesterId = Number(req.body.requesterId);
     const receiverId = Number(req.body.receiverId);
     const skillId = Number(req.body.skillId);
-    const message = (req.body.message || "").trim();
 
+    const message =
+        typeof req.body.message === "string"
+            ? req.body.message.trim()
+            : "";
+
+    // Validate student and skill IDs
     if (
         !Number.isInteger(requesterId) || requesterId <= 0 ||
         !Number.isInteger(receiverId) || receiverId <= 0 ||
@@ -656,34 +661,51 @@ app.post("/api/exchange-requests", (req, res) => {
         });
     }
 
+    // Prevent sending a request to yourself
     if (requesterId === receiverId) {
         return res.status(400).json({
             message: "You cannot send a request to yourself."
         });
     }
 
+    // Require exactly one introductory message
+    if (!message) {
+        return res.status(400).json({
+            message: "Please write a message before sending the request."
+        });
+    }
+
+    // Enforce the 255-character limit
     if (message.length > 255) {
         return res.status(400).json({
             message: "Message must be 255 characters or fewer."
         });
     }
 
-    
-const checkSql = `
-    SELECT
-        (SELECT COUNT(*) FROM wanted_skills
-         WHERE student_id = ? AND skill_id = ?) AS wants_skill,
+    // Verify that the requester wants the skill,
+    // the receiver teaches it, and no duplicate request exists.
+    const checkSql = `
+        SELECT
+            (
+                SELECT COUNT(*)
+                FROM wanted_skills
+                WHERE student_id = ? AND skill_id = ?
+            ) AS wants_skill,
 
-        (SELECT COUNT(*) FROM student_skills
-         WHERE student_id = ? AND skill_id = ?) AS teaches_skill,
+            (
+                SELECT COUNT(*)
+                FROM student_skills
+                WHERE student_id = ? AND skill_id = ?
+            ) AS teaches_skill,
 
-        (SELECT COUNT(*) FROM exchange_requests
-         WHERE requester_id = ?
-           AND receiver_id = ?
-           AND skill_id = ?) AS existing_request
-`;
-
-
+            (
+                SELECT COUNT(*)
+                FROM exchange_requests
+                WHERE requester_id = ?
+                  AND receiver_id = ?
+                  AND skill_id = ?
+            ) AS existing_request
+    `;
 
     db.query(
         checkSql,
@@ -695,6 +717,7 @@ const checkSql = `
         (err, results) => {
             if (err) {
                 console.error("Request validation error:", err.message);
+
                 return res.status(500).json({
                     message: "Unable to validate the exchange request."
                 });
@@ -714,14 +737,13 @@ const checkSql = `
                 });
             }
 
-           
-if (check.existing_request) {
-    return res.status(409).json({
-        message: "You have already sent a request for this skill to this student. You cannot send another request for the same skill."
-    });
-}
+            if (check.existing_request) {
+                return res.status(409).json({
+                    message: "You have already sent a request for this skill to this student. You cannot send another request for the same skill."
+                });
+            }
 
-
+            // Save the request and its single message
             const insertSql = `
                 INSERT INTO exchange_requests
                     (requester_id, receiver_id, skill_id, message)
@@ -730,16 +752,20 @@ if (check.existing_request) {
 
             db.query(
                 insertSql,
-                [requesterId, receiverId, skillId, message || null],
+                [requesterId, receiverId, skillId, message],
                 (insertErr, result) => {
                     if (insertErr) {
-                        console.error("Request creation error:", insertErr.message);
+                        console.error(
+                            "Request creation error:",
+                            insertErr.message
+                        );
+
                         return res.status(500).json({
                             message: "Unable to send the exchange request."
                         });
                     }
 
-                    res.status(201).json({
+                    return res.status(201).json({
                         message: "Skill exchange request sent successfully!",
                         requestId: result.insertId
                     });
