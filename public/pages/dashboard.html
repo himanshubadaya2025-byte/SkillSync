@@ -282,7 +282,35 @@
         </p>
 
     </section>
+<!-- Credit History Section -->
+<section class="content-section" id="creditHistorySection"
+    style="display: block; margin-bottom: 25px;">
 
+    <h2 class="section-title">📜 Credit History</h2>
+    <p id="creditHistoryMessage">Loading your transaction history...</p>
+
+    <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="padding: 10px; text-align: left;">Date & Time</th>
+                    <th style="padding: 10px; text-align: left;">Activity</th>
+                    <th style="padding: 10px; text-align: left;">Skill</th>
+                    <th style="padding: 10px; text-align: left;">Person</th>
+                    <th style="padding: 10px; text-align: left;">Credits</th>
+                </tr>
+            </thead>
+
+            <tbody id="creditHistoryBody">
+                <tr>
+                    <td colspan="5" style="padding: 10px;">
+                        Loading transactions...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
 
         <!-- Notifications -->
     <section class="content-section" id="notificationsSection"
@@ -1433,8 +1461,125 @@ async function loadCredits() {
             "Could not load your credits. Please refresh the page.";
     }
 }
+// Load credit transaction history
+async function loadCreditHistory() {
+    const historyMessage = document.getElementById("creditHistoryMessage");
+    const historyBody = document.getElementById("creditHistoryBody");
+
+    const studentData = sessionStorage.getItem("skillsyncStudent");
+
+    if (!studentData) {
+        historyMessage.textContent = "Please log in to view your credit history.";
+        historyBody.innerHTML = "";
+        return;
+    }
+
+    const student = JSON.parse(studentData);
+
+    try {
+        const response = await fetch(
+            `/api/credit-history?studentId=${student.studentId}`
+        );
+
+        const transactions = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                transactions.message || "Unable to load credit history."
+            );
+        }
+
+        historyBody.innerHTML = "";
+
+        if (transactions.length === 0) {
+            historyMessage.textContent = "No credit transactions yet.";
+            return;
+        }
+
+        historyMessage.textContent = "";
+
+        transactions.forEach(transaction => {
+            const row = document.createElement("tr");
+
+            const dateCell = document.createElement("td");
+            const activityCell = document.createElement("td");
+            const skillCell = document.createElement("td");
+            const personCell = document.createElement("td");
+            const creditsCell = document.createElement("td");
+
+            // Format date and time
+            const date = new Date(transaction.created_at);
+
+            dateCell.textContent = date.toLocaleString([], {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+            // Activity and person
+            if (transaction.transaction_type === "Spent") {
+                activityCell.textContent = "Learned";
+                personCell.textContent =
+                    transaction.other_student_name || "Learning partner";
+            } else if (transaction.transaction_type === "Earned") {
+                activityCell.textContent = "Taught";
+                personCell.textContent =
+                    transaction.other_student_name || "Learning partner";
+            } else if (transaction.transaction_type === "Starter") {
+                activityCell.textContent = "Starter credits";
+                personCell.textContent = "SkillSync";
+            } else {
+                activityCell.textContent = transaction.transaction_type;
+                personCell.textContent = "—";
+            }
+
+            // Skill name
+            skillCell.textContent = transaction.skill_name || "—";
+
+            // Credit amount
+            const amount = Number(transaction.amount);
+
+            creditsCell.textContent =
+                amount > 0 ? `+${amount}` : `${amount}`;
+
+            creditsCell.style.fontWeight = "bold";
+
+            if (amount > 0) {
+                creditsCell.style.color = "#15803d";
+            } else if (amount < 0) {
+                creditsCell.style.color = "#dc2626";
+            }
+
+            // Style and add cells
+            [
+                dateCell,
+                activityCell,
+                skillCell,
+                personCell,
+                creditsCell
+            ].forEach(cell => {
+                cell.style.padding = "12px 10px";
+                cell.style.borderBottom = "1px solid #e2e8f0";
+                cell.style.textAlign = "left";
+                row.appendChild(cell);
+            });
+
+            historyBody.appendChild(row);
+        });
+
+    } catch (error) {
+        console.error("Credit history error:", error);
+        historyMessage.textContent =
+            "Unable to load credit history. Please try again.";
+        historyBody.innerHTML = "";
+    }
+}
+
 
 loadCredits();
+loadCreditHistory();
 
 
 </script>

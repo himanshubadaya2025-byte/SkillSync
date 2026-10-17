@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Skills | SkillSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            background: white;
+            padding: 15px 4%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .logo {
+            font-size: 27px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+
+        .logout {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .logout:hover {
+            background: #4338ca;
+        }
+
+        .dashboard-layout {
+            max-width: 1500px;
+            margin: 24px auto 36px;
+            padding: 0 22px;
+            display: grid;
+            grid-template-columns: 205px minmax(0, 1fr) 315px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .left-sidebar,
+        .right-sidebar,
+        .center-column {
+            min-width: 0;
+        }
+
+        .left-sidebar,
+        .right-sidebar-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+        }
+
+        .left-sidebar {
+            padding: 18px 12px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .sidebar-label {
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: 8px 12px;
+        }
+
+        .nav-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            border: 0;
+            border-radius: 10px;
+            background: transparent;
+            color: #475569;
+            padding: 12px;
+            margin: 3px 0;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .nav-button.logout-link {
+            color: #dc2626;
+        }
+
+        .nav-button.logout-link:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: white;
+            padding: 27px;
+            border-radius: 18px;
+            margin-bottom: 18px;
+        }
+
+        .welcome h1 {
+            font-size: 27px;
+            margin-bottom: 12px;
+        }
+
+        .welcome p {
+            line-height: 1.6;
+            opacity: .95;
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            margin-bottom: 18px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 18px 15px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+            min-width: 0;
+        }
+
+        .summary-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .summary-card h3 {
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+            font-weight: 600;
+            margin-bottom: 9px;
+        }
+
+        .summary-value {
+            font-size: 27px;
+            font-weight: bold;
+            color: #4f46e5;
+            overflow-wrap: anywhere;
+        }
+
+        .summary-card:nth-child(2) .summary-value {
+            color: #d97706;
+        }
+
+        .summary-card:nth-child(3) .summary-value {
+            color: #16a34a;
+        }
+
+        .content-section {
+            background: white;
+            padding: 25px;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            margin-bottom: 20px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .section-heading h2 {
+            font-size: 20px;
+        }
+
+        .action-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .action-button:hover {
+            background: #4338ca;
+        }
+
+        .action-button:disabled {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        .message {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 12px 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px 14px;
+            border: 1px solid #dbe1ed;
+            border-radius: 9px;
+            font-size: 14px;
+            color: #1e293b;
+            background: white;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px #4f46e51a;
+        }
+
+        .or-text {
+            text-align: center;
+            color: #737b90;
+            font-size: 13px;
+            padding: 3px 0 16px;
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px;
+            margin: 12px 0;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            overflow-wrap: anywhere;
+        }
+
+        .skill-icon {
+            width: 42px;
+            height: 42px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #eef2ff;
+            border-radius: 11px;
+            font-size: 21px;
+        }
+
+        .skill-details {
+            min-width: 0;
+        }
+
+        .skill-name {
+            font-weight: bold;
+            font-size: 15px;
+            overflow-wrap: anywhere;
+        }
+
+        .skill-category {
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .empty {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .right-sidebar-card {
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .right-sidebar-card h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .right-sidebar-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .tip-list {
+            list-style: none;
+            margin-top: 12px;
+        }
+
+        .tip-list li {
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 9px;
+        }
+
+        .tip-list li::before {
+            content: "✓ ";
+            color: #4f46e5;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            padding: 30px 15px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-layout {
+                grid-template-columns: 175px minmax(0, 1fr) 270px;
+                gap: 15px;
+                padding: 0 16px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-layout {
+                grid-template-columns: 175px minmax(0, 1fr);
+            }
+
+            .right-sidebar {
+                grid-column: 2;
+            }
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 14px 18px;
+            }
+
+            .dashboard-layout {
+                display: flex;
+                flex-direction: column;
+                padding: 0 14px;
+                margin-top: 16px;
+            }
+
+            .left-sidebar {
+                position: static;
+                width: 100%;
+                padding: 10px;
+            }
+
+            .left-sidebar nav {
+                display: flex;
+                overflow-x: auto;
+                gap: 4px;
+            }
+
+            .sidebar-label {
+                display: none;
+            }
+
+            .nav-button {
+                width: auto;
+                white-space: nowrap;
+                flex: 0 0 auto;
+            }
+
+            .center-column,
+            .right-sidebar {
+                width: 100%;
+            }
+
+            .welcome {
+                padding: 25px;
+            }
+
+            .welcome h1 {
+                font-size: 24px;
+            }
+
+            .content-section {
+                padding: 18px;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+
+            .summary-card {
+                padding: 13px 10px;
+            }
+
+            .summary-value {
+                font-size: 23px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillSync</div>
+    <button type="button" class="logout" id="logoutButton">Log Out</button>
+</header>
+
+<div class="dashboard-layout">
+
+    <aside class="left-sidebar">
+        <div class="sidebar-label">Workspace</div>
+
+        <nav aria-label="Dashboard navigation">
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/dashboard-redesigned.html'">
+                🏠 Home
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/my-skills.html'">
+                🧠 My Skills
+            </button>
+
+            <button type="button" class="nav-button active"
+                onclick="window.location.href='/pages/learn-skills.html'">
+                🎯 Learn Skills
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/find-partners.html'">
+                🤝 Find Partners
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/requests.html'">
+                📩 Requests
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/partners.html'">
+                👥 Partners
+            </button>
+        </nav>
+
+        <div class="sidebar-label" style="margin-top:16px;">Account</div>
+
+        <nav aria-label="Account navigation">
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/profile.html'">
+                👤 My Profile
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/credit-history.html'">
+                🪙 Credit History
+            </button>
+
+            <button type="button" class="nav-button"
+                onclick="window.location.href='/pages/notifications.html'">
+                🔔 Notifications
+            </button>
+        </nav>
+
+        <button type="button" class="nav-button logout-link"
+            id="sidebarLogout" style="margin-top:18px;">
+            🚪 Logout
+        </button>
+    </aside>
+
+    <main class="center-column">
+
+        <section class="welcome">
+            <h1 id="welcomeHeading">Learn Skills 📚</h1>
+            <p>
+                Tell us what you want to learn. Discover skills offered by
+                fellow students and build your own learning journey.
+            </p>
+        </section>
+
+        <h2 class="section-title">Learning Overview</h2>
+
+        <section class="summary-grid">
+            <article class="summary-card">
+                <div class="summary-icon">🎯</div>
+                <h3>Learning Goals</h3>
+                <div class="summary-value" id="totalWantedSkills">0</div>
+            </article>
+
+            <article class="summary-card">
+                <div class="summary-icon">📚</div>
+                <h3>Available Skills</h3>
+                <div class="summary-value" id="availableSkillsCount">0</div>
+            </article>
+
+            <article class="summary-card">
+                <div class="summary-icon">🚀</div>
+                <h3>Keep Growing</h3>
+                <div class="summary-value">+</div>
+            </article>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>➕ Add a Skill to Learn</h2>
+            </div>
+
+            <p class="message">
+                Choose an existing skill or enter a new learning goal.
+                Select only one option at a time.
+            </p>
+
+            <form id="learnSkillForm">
+                <div class="form-group">
+                    <label for="skillSelect">Choose an Available Skill</label>
+                    <select id="skillSelect">
+                        <option value="">Loading available skills...</option>
+                    </select>
+                </div>
+
+                <p class="or-text">— OR enter a new skill —</p>
+
+                <div class="form-group">
+                    <label for="customSkill">Custom Skill</label>
+                    <input
+                        type="text"
+                        id="customSkill"
+                        placeholder="e.g. Graphic Design"
+                        maxlength="100"
+                    >
+                </div>
+
+                <button type="submit" class="action-button" id="addSkillButton">
+                    + Add Skill to Learning List
+                </button>
+            </form>
+
+            <p id="message" class="message" aria-live="polite"></p>
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>🎯 Skills I Want to Learn</h2>
+            </div>
+
+            <p class="message">
+                Your current learning goals are listed below.
+            </p>
+
+            <div id="wantedSkillsList">
+                <p class="empty">Loading your learning list...</p>
+            </div>
+        </section>
+
+    </main>
+
+    <aside class="right-sidebar">
+
+        <section class="right-sidebar-card">
+            <h2>💡 Quick Tip</h2>
+            <p>
+                Start with skills that support your interests, coursework,
+                or future career goals.
+            </p>
+
+            <ul class="tip-list">
+                <li>Set clear learning goals.</li>
+                <li>Explore skills before choosing.</li>
+                <li>Practise consistently with your peers.</li>
+            </ul>
+        </section>
+
+        <section class="right-sidebar-card">
+            <h2>🤝 Find a Learning Partner</h2>
+            <p>
+                Find students who can help you learn the skills you want
+                to develop.
+            </p>
+
+            <button type="button" class="action-button"
+                style="margin-top:14px;"
+                onclick="window.location.href='/pages/find-partners.html'">
+                Find Partners
+            </button>
+        </section>
+
+        <section class="right-sidebar-card">
+            <h2>🧠 Share Your Knowledge</h2>
+            <p>
+                You can also add skills you know and help another student
+                learn something new.
+            </p>
+
+            <button type="button" class="action-button"
+                style="margin-top:14px;"
+                onclick="window.location.href='/pages/my-skills.html'">
+                Manage My Skills
+            </button>
+        </section>
+
+    </aside>
+
+</div>
+
+<footer>
+    SkillSync — Share Skills, Grow Together.
+</footer>
+
+<script>
+    "use strict";
+
+    let student = null;
+
+    try {
+        student = JSON.parse(
+            sessionStorage.getItem("skillsyncStudent") || "null"
+        );
+    } catch (error) {
+        console.error("Unable to read student session:", error);
+    }
+
+    if (!student || !student.studentId) {
+        window.location.href = "/pages/login.html";
+    } else {
+        document.getElementById("welcomeHeading").textContent =
+            `Learn Skills, ${student.fullName || "Student"} 📚`;
+    }
+
+    const skillSelect = document.getElementById("skillSelect");
+    const customSkillInput = document.getElementById("customSkill");
+    const learnSkillForm = document.getElementById("learnSkillForm");
+    const wantedSkillsList = document.getElementById("wantedSkillsList");
+    const message = document.getElementById("message");
+    const addSkillButton = document.getElementById("addSkillButton");
+
+    function createTextElement(tag, className, text) {
+        const element = document.createElement(tag);
+        element.className = className;
+        element.textContent = text;
+        return element;
+    }
+
+    async function loadAvailableSkills() {
+        try {
+            const response = await fetch("/api/skills");
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Unable to load available skills."
+                );
+            }
+
+            const skills = Array.isArray(data)
+                ? data
+                : (data.skills || []);
+
+            skillSelect.replaceChildren();
+
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = "Choose a skill";
+            skillSelect.appendChild(placeholder);
+
+            skills.forEach(skill => {
+                const option = document.createElement("option");
+                option.value = skill.skill_id;
+                option.textContent = skill.skill_name;
+                skillSelect.appendChild(option);
+            });
+
+            document.getElementById("availableSkillsCount").textContent =
+                skills.length;
+
+        } catch (error) {
+            console.error("Load available skills error:", error);
+
+            document.getElementById("availableSkillsCount").textContent = "—";
+
+            skillSelect.replaceChildren();
+
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "Could not load skills";
+            skillSelect.appendChild(option);
+        }
+    }
+
+    async function loadWantedSkills() {
+        try {
+            const response = await fetch(
+                `/api/wanted-skills?studentId=${encodeURIComponent(student.studentId)}`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Unable to load your learning list."
+                );
+            }
+
+            const skills = Array.isArray(data)
+                ? data
+                : (data.skills || []);
+
+            document.getElementById("totalWantedSkills").textContent =
+                skills.length;
+
+            wantedSkillsList.replaceChildren();
+
+            if (skills.length === 0) {
+                wantedSkillsList.appendChild(
+                    createTextElement(
+                        "p",
+                        "empty",
+                        "You haven't added any learning goals yet. Add a skill above!"
+                    )
+                );
+                return;
+            }
+
+            skills.forEach(skill => {
+                const item = document.createElement("article");
+                item.className = "skill-item";
+
+                item.appendChild(
+                    createTextElement("div", "skill-icon", "📚")
+                );
+
+                const details = document.createElement("div");
+                details.className = "skill-details";
+
+                details.appendChild(
+                    createTextElement(
+                        "div",
+                        "skill-name",
+                        skill.skill_name || skill.name || "Unnamed skill"
+                    )
+                );
+
+                if (skill.category) {
+                    details.appendChild(
+                        createTextElement(
+                            "div",
+                            "skill-category",
+                            skill.category
+                        )
+                    );
+                }
+
+                item.appendChild(details);
+                wantedSkillsList.appendChild(item);
+            });
+
+        } catch (error) {
+            console.error("Load wanted skills error:", error);
+
+            document.getElementById("totalWantedSkills").textContent = "—";
+            wantedSkillsList.replaceChildren();
+
+            wantedSkillsList.appendChild(
+                createTextElement(
+                    "p",
+                    "empty",
+                    "Unable to load your learning list. Please refresh the page."
+                )
+            );
+        }
+    }
+
+    learnSkillForm.addEventListener("submit", async function(event) {
+        event.preventDefault();
+
+        const skillId = skillSelect.value;
+        const customSkill = customSkillInput.value.trim();
+
+        if (!skillId && !customSkill) {
+            message.textContent =
+                "Please choose a skill or enter a custom skill.";
+            message.style.color = "#b91c1c";
+            return;
+        }
+
+        if (skillId && customSkill) {
+            message.textContent =
+                "Please choose an existing skill OR enter a custom skill, not both.";
+            message.style.color = "#b91c1c";
+            return;
+        }
+
+        addSkillButton.disabled = true;
+        message.textContent = "Adding your learning goal...";
+        message.style.color = "#64748b";
+
+        try {
+            const payload = {
+                studentId: student.studentId
+            };
+
+            if (customSkill) {
+                payload.customSkill = customSkill;
+            } else {
+                payload.skillId = Number(skillId);
+            }
+
+            const response = await fetch("/api/wanted-skills", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Unable to add this learning goal."
+                );
+            }
+
+            message.textContent =
+                data.message || "Skill added to your learning list!";
+            message.style.color = "#166534";
+
+            skillSelect.value = "";
+            customSkillInput.value = "";
+
+            await loadWantedSkills();
+
+        } catch (error) {
+            console.error("Add wanted skill error:", error);
+            message.textContent = error.message;
+            message.style.color = "#b91c1c";
+        } finally {
+            addSkillButton.disabled = false;
+        }
+    });
+
+    function logout() {
+        sessionStorage.removeItem("skillsyncStudent");
+        window.location.href = "/pages/login.html";
+    }
+
+    document.getElementById("logoutButton").addEventListener("click", logout);
+
+    document.getElementById("sidebarLogout").addEventListener("click", function() {
+        logout();
+    });
+
+    if (student && student.studentId) {
+        loadAvailableSkills();
+        loadWantedSkills();
+    }
+</script>
+
+</body>
+</html>
