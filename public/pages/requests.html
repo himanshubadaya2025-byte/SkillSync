@@ -36,6 +36,18 @@
             font-size: 26px;
             font-weight: bold;
         }
+        .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.brand-tagline {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.4;
+}
 
         .header-actions {
             display: flex;
@@ -535,7 +547,12 @@
 <body>
 
 <header>
-    <div class="logo">SkillSync.</div>
+    <div class="brand">
+        <div class="logo">SkillSync</div>
+        <div class="brand-tagline">
+            A Student Skill Exchange &amp; Peer Learning Platform
+        </div>
+    </div>
 
     <div class="header-actions">
         <button class="refresh-button" id="refreshButton" type="button">
