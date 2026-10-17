@@ -1,170 +1,252 @@
 (function () {
-const studentData =
-localStorage.getItem("skillsyncStudent") ||
-sessionStorage.getItem("skillsyncStudent");
+    // Get the logged-in student's information.
+    const studentData =
+        localStorage.getItem("skillsyncStudent") ||
+        sessionStorage.getItem("skillsyncStudent");
 
-if (!studentData) {
-    console.warn("SkillSync popup: Student data not found in browser storage.");
-    return;
-}
-
-let student;
-
-try {
-    student = JSON.parse(studentData);
-} catch (error) {
-    console.error("SkillSync popup: Unable to read student data.", error);
-    return;
-}
-
-const studentId = student.studentId ?? student.student_id ?? student.id;
-
-if (!studentId) {
-    console.warn("SkillSync popup: Student ID not found.", student);
-    return;
-}
-
-
-    const STORAGE_KEY = `skillsync_seen_notifications_${studentId}`;
-
-    let seenNotifications = new Set();
-let notificationsInitialized = false;
-
-    try {
-        seenNotifications = new Set(
-            JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")
-        );
-    } catch {
-        seenNotifications = new Set();
+    if (!studentData) {
+        console.log("SkillSync popup: No logged-in student found.");
+        return;
     }
 
+    let student;
+
+    try {
+        student = JSON.parse(studentData);
+    } catch (error) {
+        console.error("SkillSync popup: Invalid student data.", error);
+        return;
+    }
+
+    const studentId =
+        student.studentId ?? student.student_id ?? student.id;
+
+    if (!studentId) {
+        console.error("SkillSync popup: Student ID is missing.");
+        return;
+    }
+
+    const SNOOZE_KEY = `skillsync_popup_snooze_${studentId}`;
+    const SNOOZE_DURATION = 10 * 60 * 1000;
+
+    let popupOpen = false;
+    let lastNotificationSignature = "";
+
+    // Add the popup's design.
     const style = document.createElement("style");
 
     style.textContent = `
-        #skillsync-toast-container {
+        #skillsync-modal-overlay {
             position: fixed;
-            top: 90px;
-            right: 20px;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: min(360px, calc(100vw - 32px));
-        }
-
-        .skillsync-toast {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-left: 5px solid #4f46e5;
-            border-radius: 12px;
-            padding: 16px;
-            box-shadow: 0 10px 35px rgba(15, 23, 42, 0.16);
-            animation: skillsyncToastIn 0.25s ease-out;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.60);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 999999;
             font-family: Arial, sans-serif;
         }
 
-        .skillsync-toast-title {
-            font-weight: 700;
-            color: #172033;
-            font-size: 15px;
-            margin-bottom: 7px;
+        #skillsync-modal {
+            background: #ffffff;
+            width: 100%;
+            max-width: 430px;
+            padding: 32px 26px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+            animation: skillsyncModalIn 0.25s ease-out;
         }
 
-        .skillsync-toast-message {
-            color: #64748b;
-            font-size: 13px;
-            line-height: 1.5;
-        }
-
-        .skillsync-toast-actions {
+        .skillsync-modal-icon {
+            width: 68px;
+            height: 68px;
+            margin: 0 auto 18px;
             display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-            margin-top: 12px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #eef2ff;
+            font-size: 32px;
         }
 
-        .skillsync-toast-actions button {
+        .skillsync-modal-title {
+            color: #172033;
+            font-size: 23px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .skillsync-modal-message {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        .skillsync-modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+        }
+
+        .skillsync-modal-buttons button {
+            width: 100%;
+            padding: 13px 16px;
             border: none;
-            border-radius: 7px;
-            padding: 8px 11px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
         }
 
-        .skillsync-toast-view {
+        #skillsync-view-button {
             background: #4f46e5;
             color: white;
         }
 
-        .skillsync-toast-close {
+        #skillsync-view-button:hover {
+            background: #4338ca;
+        }
+
+        #skillsync-later-button {
             background: #f1f5f9;
             color: #334155;
         }
 
-        @keyframes skillsyncToastIn {
+        #skillsync-later-button:hover {
+            background: #e2e8f0;
+        }
+
+        @keyframes skillsyncModalIn {
             from {
                 opacity: 0;
-                transform: translateX(20px);
+                transform: translateY(15px) scale(0.97);
             }
+
             to {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translateY(0) scale(1);
             }
         }
 
         @media (max-width: 480px) {
-            #skillsync-toast-container {
-                top: 85px;
-                right: 12px;
-                width: calc(100vw - 24px);
+            #skillsync-modal {
+                padding: 26px 20px;
+            }
+
+            .skillsync-modal-title {
+                font-size: 21px;
             }
         }
     `;
 
     document.head.appendChild(style);
 
-    const container = document.createElement("div");
-    container.id = "skillsync-toast-container";
-    container.setAttribute("aria-live", "polite");
-    document.body.appendChild(container);
+    // Create the popup.
+    const overlay = document.createElement("div");
+    overlay.id = "skillsync-modal-overlay";
 
-    function showToast(title, message) {
-        const toast = document.createElement("div");
-        toast.className = "skillsync-toast";
+    overlay.innerHTML = `
+        <div id="skillsync-modal" role="dialog"
+             aria-modal="true"
+             aria-labelledby="skillsync-modal-title">
 
-        const titleElement = document.createElement("div");
-        titleElement.className = "skillsync-toast-title";
-        titleElement.textContent = title;
+            <div class="skillsync-modal-icon">🔔</div>
 
-        const messageElement = document.createElement("div");
-        messageElement.className = "skillsync-toast-message";
+            <div class="skillsync-modal-title"
+                 id="skillsync-modal-title">
+                You Have Notifications!
+            </div>
+
+            <div class="skillsync-modal-message"
+                 id="skillsync-modal-message">
+                You have updates waiting for you on SkillSync.
+                Would you like to check them now?
+            </div>
+
+            <div class="skillsync-modal-buttons">
+                <button id="skillsync-view-button">
+                    View Notifications
+                </button>
+
+                <button id="skillsync-later-button">
+                    Remind Me Later
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const messageElement = document.getElementById(
+        "skillsync-modal-message"
+    );
+
+    const viewButton = document.getElementById(
+        "skillsync-view-button"
+    );
+
+    const laterButton = document.getElementById(
+        "skillsync-later-button"
+    );
+
+    function showPopup(notifications) {
+        if (popupOpen || notifications.length === 0) {
+            return;
+        }
+
+        const incomingCount = notifications.filter(
+            notification =>
+                notification.notification_type === "Incoming"
+        ).length;
+
+        const updateCount = notifications.length - incomingCount;
+
+        let message = `You have ${notifications.length} notification${
+            notifications.length === 1 ? "" : "s"
+        } waiting for you.`;
+
+        if (incomingCount > 0) {
+            message += ` ${incomingCount} new or pending skill exchange request${
+                incomingCount === 1 ? "" : "s"
+            } need${incomingCount === 1 ? "s" : ""} your attention.`;
+        }
+
+        if (updateCount > 0) {
+            message += ` You also have ${updateCount} request update${
+                updateCount === 1 ? "" : "s"
+            }.`;
+        }
+
         messageElement.textContent = message;
-
-        const actions = document.createElement("div");
-        actions.className = "skillsync-toast-actions";
-
-        const closeButton = document.createElement("button");
-        closeButton.className = "skillsync-toast-close";
-        closeButton.textContent = "Dismiss";
-
-        const viewButton = document.createElement("button");
-        viewButton.className = "skillsync-toast-view";
-        viewButton.textContent = "View Notifications";
-
-        closeButton.addEventListener("click", () => toast.remove());
-
-        viewButton.addEventListener("click", () => {
-            window.location.href = "/pages/notifications.html";
-        });
-
-        actions.append(closeButton, viewButton);
-        toast.append(titleElement, messageElement, actions);
-        container.appendChild(toast);
-
-        setTimeout(() => toast.remove(), 7000);
+        overlay.style.display = "flex";
+        popupOpen = true;
     }
 
+    function closePopup() {
+        overlay.style.display = "none";
+        popupOpen = false;
+    }
+
+    // Open the notifications page.
+    viewButton.addEventListener("click", function () {
+        window.location.href = "/pages/notifications.html";
+    });
+
+    // Hide the popup for 10 minutes.
+    laterButton.addEventListener("click", function () {
+        sessionStorage.setItem(
+            SNOOZE_KEY,
+            String(Date.now() + SNOOZE_DURATION)
+        );
+
+        closePopup();
+    });
+
+    // Fetch notifications and decide whether to show the popup.
     async function checkNotifications() {
         try {
             const response = await fetch(
@@ -172,73 +254,72 @@ let notificationsInitialized = false;
                 { cache: "no-store" }
             );
 
-            if (!response.ok) return;
+            if (!response.ok) {
+                console.error(
+                    "SkillSync popup: API request failed.",
+                    response.status
+                );
+                return;
+            }
 
             const notifications = await response.json();
 
-if (!notificationsInitialized) {
-    notifications.forEach(notification => {
-        seenNotifications.add(
-            `${notification.request_id}_${notification.status}`
-        );
-    });
-
-    localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify([...seenNotifications].slice(-200))
-    );
-
-    notificationsInitialized = true;
-    return;
-}
-
-for (const notification of notifications) {
-                const notificationId =
-                    `${notification.request_id}_${notification.status}`;
-
-                if (seenNotifications.has(notificationId)) continue;
-
-                seenNotifications.add(notificationId);
-
-                let title;
-                let message;
-
-                if (notification.notification_type === "Incoming") {
-                    title = "🔔 New Skill Exchange Request";
-                    message =
-                        `${notification.other_student_name} wants to exchange skills involving ${notification.skill_name}.`;
-                } else if (notification.status === "Accepted") {
-                    title = "✅ Request Accepted";
-                    message =
-                        `${notification.other_student_name} accepted your request involving ${notification.skill_name}.`;
-                } else if (notification.status === "Rejected") {
-                    title = "❌ Request Declined";
-                    message =
-                        `${notification.other_student_name} declined your request involving ${notification.skill_name}.`;
-                } else {
-                    continue;
-                }
-
-                showToast(title, message);
+            if (!Array.isArray(notifications)) {
+                console.error(
+                    "SkillSync popup: Unexpected API response."
+                );
+                return;
             }
 
-            localStorage.setItem(
-                STORAGE_KEY,
-                JSON.stringify([...seenNotifications].slice(-200))
+            // Don't show anything if there are no notifications.
+            if (notifications.length === 0) {
+                lastNotificationSignature = "";
+                return;
+            }
+
+            // Identify the notifications currently available.
+            const signature = notifications
+                .map(notification =>
+                    `${notification.request_id}_${notification.status}_${notification.notification_type}`
+                )
+                .sort()
+                .join("|");
+
+            const isNewNotificationSet =
+                signature !== lastNotificationSignature;
+
+            lastNotificationSignature = signature;
+
+            // Respect the Remind Me Later button.
+            const snoozeUntil = Number(
+                sessionStorage.getItem(SNOOZE_KEY) || 0
             );
+
+            if (Date.now() < snoozeUntil) {
+                return;
+            }
+
+            // Show on login and when the notification list changes.
+            if (!popupOpen && isNewNotificationSet) {
+                showPopup(notifications);
+            }
+
         } catch (error) {
-            console.error("SkillSync notification popup error:", error);
+            console.error(
+                "SkillSync popup: Unable to load notifications.",
+                error
+            );
         }
     }
 
-    // Load existing notifications without treating them as new.
-    checkNotifications().then(() => {
-        setTimeout(() => {
-            // The first check establishes the baseline.
-            // Subsequent checks detect new notifications.
-        }, 0);
-    });
+    // Check immediately after the dashboard loads.
+    checkNotifications();
 
-    // Check periodically for new notifications.
+    // Continue checking for new notifications every 10 seconds.
     setInterval(checkNotifications, 10000);
+
+    console.log(
+        "SkillSync notification popup initialized for student:",
+        studentId
+    );
 })();
