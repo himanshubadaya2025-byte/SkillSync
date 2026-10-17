@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | SkillSync</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6fb;
+            color: #1e293b;
+        }
+
+        header {
+            height: 68px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: #4f46e5;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .header-logout {
+            border: none;
+            background: #eef2ff;
+            color: #4338ca;
+            padding: 10px 16px;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .header-logout:hover {
+            background: #e0e7ff;
+        }
+
+        .dashboard-layout {
+            max-width: 1500px;
+            margin: 24px auto 36px;
+            padding: 0 22px;
+            display: grid;
+            grid-template-columns: 205px minmax(0, 1fr) 315px;
+            gap: 22px;
+            align-items: start;
+        }
+
+        .left-sidebar {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px 12px;
+            position: sticky;
+            top: 88px;
+        }
+
+        .sidebar-heading {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 10px;
+            margin: 8px 0 10px;
+        }
+
+        .nav-button {
+            display: block;
+            width: 100%;
+            text-decoration: none;
+            color: #475569;
+            padding: 11px 10px;
+            margin-bottom: 4px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .nav-button:hover,
+        .nav-button.active {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .nav-button.logout {
+            color: #dc2626;
+            margin-top: 12px;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            text-align: left;
+        }
+
+        .nav-button.logout:hover {
+            background: #fef2f2;
+        }
+
+        .center-column {
+            min-width: 0;
+        }
+
+        .welcome {
+            background: linear-gradient(120deg, #4f46e5, #7c3aed);
+            color: white;
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 22px;
+        }
+
+        .welcome .eyebrow {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.85;
+            margin-bottom: 12px;
+        }
+
+        .welcome h1 {
+            font-size: 29px;
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .welcome p {
+            font-size: 14px;
+            line-height: 1.7;
+            opacity: 0.95;
+            max-width: 650px;
+        }
+
+        .section-title {
+            font-size: 19px;
+            margin: 26px 0 14px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 19px;
+            min-width: 0;
+        }
+
+        .summary-card .label {
+            color: #64748b;
+            font-size: 12px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+
+        .summary-card .value {
+            color: #4f46e5;
+            font-size: 24px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .content-section {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 22px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .section-heading h2 {
+            font-size: 19px;
+        }
+
+        .section-description {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+            margin: -7px 0 18px;
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding-bottom: 23px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 23px;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            background: #eef2ff;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 25px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .profile-top h2 {
+            font-size: 21px;
+            margin-bottom: 7px;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-top p {
+            color: #64748b;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .detail {
+            background: #f8fafc;
+            border: 1px solid #eef2f7;
+            padding: 17px;
+            border-radius: 11px;
+            min-width: 0;
+        }
+
+        .detail label {
+            display: block;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .detail p {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .action-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 17px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .action-button:hover {
+            background: #3730a3;
+        }
+
+        .action-button.secondary {
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .action-button.secondary:hover {
+            background: #e0e7ff;
+        }
+
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .right-sidebar-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 21px;
+        }
+
+        .right-sidebar-card h3 {
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .right-sidebar-card p {
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .tip-icon {
+            font-size: 25px;
+            margin-bottom: 10px;
+        }
+
+        .quick-link {
+            display: block;
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            padding: 8px 20px 24px;
+        }
+
+        @media (max-width: 1150px) {
+            .dashboard-layout {
+                grid-template-columns: 190px minmax(0, 1fr);
+            }
+
+            .right-sidebar {
+                grid-column: 2;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .left-sidebar {
+                position: static;
+            }
+
+            .right-sidebar {
+                grid-column: 1;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 760px) {
+            header {
+                padding: 0 16px;
+            }
+
+            .dashboard-layout {
+                margin-top: 16px;
+                padding: 0 14px;
+                gap: 16px;
+            }
+
+            .left-sidebar {
+                padding: 16px 12px;
+            }
+
+            .left-sidebar nav {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 4px;
+            }
+
+            .sidebar-heading {
+                grid-column: 1 / -1;
+            }
+
+            .nav-button {
+                font-size: 12px;
+                padding: 10px 8px;
+            }
+
+            .nav-button.logout {
+                margin-top: 0;
+            }
+
+            .welcome {
+                padding: 23px;
+            }
+
+            .welcome h1 {
+                font-size: 25px;
+            }
+
+            .content-section {
+                padding: 19px;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .summary-card {
+                padding: 15px;
+            }
+
+            .summary-card .value {
+                font-size: 21px;
+            }
+
+            .details-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-top {
+                align-items: flex-start;
+            }
+
+            .right-sidebar {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .logo {
+                font-size: 22px;
+            }
+
+            .header-logout {
+                padding: 9px 11px;
+                font-size: 12px;
+            }
+
+            .welcome h1 {
+                font-size: 22px;
+            }
+
+            .content-section {
+                padding: 16px;
+            }
+
+            .avatar {
+                width: 58px;
+                height: 58px;
+                font-size: 21px;
+            }
+
+            .profile-top h2 {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">SkillSync.</div>
+    <button class="header-logout" id="headerLogoutButton">Log Out</button>
+</header>
+
+<div class="dashboard-layout">
+
+    <aside class="left-sidebar">
+        <div class="sidebar-heading">Workspace</div>
+
+        <nav>
+            <a class="nav-button" href="/pages/dashboard-redesigned.html">🏠 Home</a>
+            <a class="nav-button" href="/pages/my-skills.html">🧠 My Skills</a>
+            <a class="nav-button" href="/pages/learn-skills.html">🎯 Learn Skills</a>
+            <a class="nav-button" href="/pages/find-partners.html">🤝 Find Partners</a>
+            <a class="nav-button" href="/pages/requests.html">📩 Requests</a>
+            <a class="nav-button" href="/pages/partners.html">👥 Partners</a>
+
+            <div class="sidebar-heading">Account</div>
+
+            <a class="nav-button active" href="/pages/profile.html">👤 My Profile</a>
+            <a class="nav-button" href="/pages/credit-history.html">🪙 Credit History</a>
+            <a class="nav-button" href="/pages/notifications.html">🔔 Notifications</a>
+
+            <a class="nav-button logout" href="#" id="logoutButton">🚪 Log Out</a>
+        </nav>
+    </aside>
+
+    <main class="center-column">
+
+        <section class="welcome">
+            <div class="eyebrow">Your Account · Your Learning Journey</div>
+            <h1 id="welcomeTitle">My Profile 👤</h1>
+            <p>
+                View your personal information and SkillSync account details.
+                Keep track of your student identity as you connect, exchange
+                knowledge, and grow with your learning community.
+            </p>
+        </section>
+
+        <h2 class="section-title">Your Account Overview</h2>
+
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="label">Account Type</div>
+                <div class="value">Student</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Department</div>
+                <div class="value" id="departmentSummary" style="font-size:18px;">Loading...</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="label">Profile Status</div>
+                <div class="value" style="font-size:18px;">Active</div>
+            </div>
+        </div>
+
+        <section class="content-section">
+
+            <div class="section-heading">
+                <h2>Personal Information 👤</h2>
+            </div>
+
+            <div class="profile-top">
+                <div class="avatar" id="profileAvatar">S</div>
+
+                <div>
+                    <h2 id="studentName">Loading profile...</h2>
+                    <p id="studentDepartment">Student</p>
+                </div>
+            </div>
+
+            <div class="details-grid">
+
+                <div class="detail">
+                    <label>Full Name</label>
+                    <p id="detailName">Loading...</p>
+                </div>
+
+                <div class="detail">
+                    <label>Student ID</label>
+                    <p id="detailId">Loading...</p>
+                </div>
+
+                <div class="detail">
+                    <label>Email Address</label>
+                    <p id="detailEmail">Not available</p>
+                </div>
+
+                <div class="detail">
+                    <label>Department</label>
+                    <p id="detailDepartment">Not available</p>
+                </div>
+
+            </div>
+
+            <p class="status-message" id="profileMessage" role="status">
+                Loading your profile information...
+            </p>
+
+        </section>
+
+        <section class="content-section">
+            <div class="section-heading">
+                <h2>Continue Your Journey 🚀</h2>
+            </div>
+
+            <p class="section-description">
+                Explore learning opportunities, connect with other students,
+                and manage your skill exchanges from your workspace.
+            </p>
+
+            <a href="/pages/dashboard-redesigned.html" class="action-button">
+                ← Back to Home
+            </a>
+        </section>
+
+    </main>
+
+    <aside class="right-sidebar">
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">👤</div>
+            <h3>Your Student Profile</h3>
+            <p>
+                Your profile helps identify your SkillSync account. Your name,
+                student ID, email, and department are displayed using the
+                information available in your current session.
+            </p>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">🧠</div>
+            <h3>Show What You Know</h3>
+            <p>
+                Add skills you can teach to help other students discover
+                opportunities to learn from you.
+            </p>
+
+            <a class="action-button quick-link" href="/pages/my-skills.html">
+                Manage My Skills
+            </a>
+        </section>
+
+        <section class="right-sidebar-card">
+            <div class="tip-icon">🎯</div>
+            <h3>Keep Learning</h3>
+            <p>
+                Explore skills you want to learn and connect with students
+                who can help you develop new abilities.
+            </p>
+
+            <a class="action-button secondary quick-link" href="/pages/learn-skills.html">
+                My Learning Goals
+            </a>
+        </section>
+
+    </aside>
+
+</div>
+
+<footer>SkillSync — Share Skills, Grow Together.</footer>
+
+<script>
+    const savedStudent = sessionStorage.getItem("skillsyncStudent");
+
+    function logout() {
+        sessionStorage.removeItem("skillsyncStudent");
+        window.location.href = "/pages/login.html";
+    }
+
+    document.getElementById("logoutButton").addEventListener(
+        "click",
+        function(event) {
+            event.preventDefault();
+            logout();
+        }
+    );
+
+    document.getElementById("headerLogoutButton").addEventListener(
+        "click",
+        logout
+    );
+
+    if (!savedStudent) {
+        window.location.replace("/pages/login.html");
+    } else {
+        try {
+            const student = JSON.parse(savedStudent);
+
+            const name =
+                student.name ||
+                student.studentName ||
+                student.full_name ||
+                student.fullName ||
+                student.username ||
+                "Student";
+
+            const studentId =
+                student.studentId ??
+                student.student_id ??
+                student.id ??
+                "Not available";
+
+            const email =
+                student.email ||
+                student.studentEmail ||
+                student.student_email ||
+                "Not available";
+
+            const department =
+                student.department ||
+                student.studentDepartment ||
+                student.student_department ||
+                student.dept ||
+                "Not available";
+
+            document.getElementById("welcomeTitle").textContent =
+                `Welcome, ${name} 👤`;
+
+            document.getElementById("studentName").textContent = name;
+            document.getElementById("detailName").textContent = name;
+            document.getElementById("detailId").textContent = studentId;
+            document.getElementById("detailEmail").textContent = email;
+            document.getElementById("detailDepartment").textContent = department;
+            document.getElementById("studentDepartment").textContent = department;
+            document.getElementById("departmentSummary").textContent = department;
+
+            const initials = name
+                .trim()
+                .split(/\s+/)
+                .map(part => part[0])
+                .join("")
+                .substring(0, 2)
+                .toUpperCase();
+
+            document.getElementById("profileAvatar").textContent =
+                initials || "S";
+
+            document.getElementById("profileMessage").textContent =
+                "Your profile information is displayed above.";
+
+        } catch (error) {
+            console.error("Unable to load student profile:", error);
+
+            document.getElementById("studentName").textContent =
+                "Unable to load profile";
+
+            document.getElementById("detailName").textContent =
+                "Not available";
+
+            document.getElementById("detailId").textContent =
+                "Not available";
+
+            document.getElementById("detailEmail").textContent =
+                "Not available";
+
+            document.getElementById("detailDepartment").textContent =
+                "Not available";
+
+            document.getElementById("departmentSummary").textContent =
+                "Not available";
+
+            document.getElementById("studentDepartment").textContent =
+                "Not available";
+
+            document.getElementById("profileMessage").textContent =
+                "Your saved session could not be read. Please log out and sign in again.";
+        }
+    }
+</script>
+
+</body>
+</html>
