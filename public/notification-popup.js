@@ -26,11 +26,23 @@
         return;
     }
 
-    const SNOOZE_KEY = `skillsync_popup_snooze_${studentId}`;
-    const SNOOZE_DURATION = 10 * 60 * 1000;
+    const STORAGE_KEY = `skillsync_seen_notifications_${studentId}`;
+const SNOOZE_KEY = `skillsync_popup_snooze_${studentId}`;
+const REMINDER_KEY = `skillsync_reminder_used_${studentId}`;
+const SNOOZE_DURATION = 10 * 60 * 1000;
 
-    let popupOpen = false;
-    let lastNotificationSignature = "";
+let popupOpen = false;
+let pendingNotifications = [];
+
+let seenNotifications = new Set();
+
+try {
+    seenNotifications = new Set(
+        JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]")
+    );
+} catch {
+    seenNotifications = new Set();
+}
 
     // Add the popup's design.
     const style = document.createElement("style");
@@ -233,19 +245,32 @@
 
     // Open the notifications page.
     viewButton.addEventListener("click", function () {
-        window.location.href = "/pages/notifications.html";
+    pendingNotifications.forEach(notification => {
+        seenNotifications.add(
+            `${notification.request_id}_${notification.status}`
+        );
     });
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify([...seenNotifications].slice(-500))
+    );
+
+    closePopup();
+    window.location.href = "/pages/notifications.html";
+});
 
     // Hide the popup for 10 minutes.
     laterButton.addEventListener("click", function () {
-        sessionStorage.setItem(
-            SNOOZE_KEY,
-            String(Date.now() + SNOOZE_DURATION)
-        );
+    sessionStorage.setItem(
+        SNOOZE_KEY,
+        String(Date.now() + SNOOZE_DURATION)
+    );
 
-        closePopup();
-    });
+    sessionStorage.removeItem(REMINDER_KEY);
 
+    closePopup();
+});
     // Fetch notifications and decide whether to show the popup.
     async function checkNotifications() {
         try {
@@ -271,38 +296,62 @@
                 return;
             }
 
-            // Don't show anything if there are no notifications.
-            if (notifications.length === 0) {
-                lastNotificationSignature = "";
-                return;
-            }
+           // Show only notifications that haven't been seen.
+const unseenNotifications = notifications.filter(notification => {
+    const notificationId =
+        `${notification.request_id}_${notification.status}`;
 
-            // Identify the notifications currently available.
-            const signature = notifications
-                .map(notification =>
-                    `${notification.request_id}_${notification.status}_${notification.notification_type}`
-                )
-                .sort()
-                .join("|");
+    return !seenNotifications.has(notificationId);
+});
 
-            const isNewNotificationSet =
-                signature !== lastNotificationSignature;
+// Nothing new or unseen? Don't show a popup.
+if (unseenNotifications.length === 0) {
+    return;
+}
 
-            lastNotificationSignature = signature;
+pendingNotifications = unseenNotifications;
 
-            // Respect the Remind Me Later button.
-            const snoozeUntil = Number(
-                sessionStorage.getItem(SNOOZE_KEY) || 0
-            );
+// Check whether the student postponed the popup.
+const snoozeUntil = Number(
+    sessionStorage.getItem(SNOOZE_KEY) || 0
+);
 
-            if (Date.now() < snoozeUntil) {
-                return;
-            }
+if (Date.now() < snoozeUntil) {
+    return;
+}
 
-            // Show on login and when the notification list changes.
-            if (!popupOpen && isNewNotificationSet) {
-                showPopup(notifications);
-            }
+// If the postponed reminder has already been shown,
+// don't show it repeatedly.
+if (sessionStorage.getItem(REMINDER_KEY) === "shown") {
+    return;
+}
+
+
+// Show the unseen notifications.
+const reminderTime = Number(
+    sessionStorage.getItem(SNOOZE_KEY) || 0
+);
+
+if (reminderTime > 0 && Date.now() >= reminderTime) {
+    sessionStorage.setItem(REMINDER_KEY, "shown");
+
+    // The postponed reminder is shown only once.
+    unseenNotifications.forEach(notification => {
+        seenNotifications.add(
+            `${notification.request_id}_${notification.status}`
+        );
+    });
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify([...seenNotifications].slice(-500))
+    );
+}
+
+showPopup(unseenNotifications);
+showPopup(unseenNotifications);
+
+           
 
         } catch (error) {
             console.error(
