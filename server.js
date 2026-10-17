@@ -536,7 +536,7 @@ app.post("/api/my-skills", (req, res) => {
                     if (insertErr) {
                         // Another request may have created the same skill.
                         if (insertErr.code === "ER_DUP_ENTRY") {
-                            return db.query(
+                            db.query(
                                 "SELECT skill_id FROM skills WHERE LOWER(skill_name) = LOWER(?) LIMIT 1",
                                 [customSkill],
                                 (findErr, existingSkills) => {
