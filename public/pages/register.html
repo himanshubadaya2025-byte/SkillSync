@@ -33,7 +33,7 @@
         }
 
         header {
-            height: 76px;
+            min-height: 80px;
             padding: 0 7%;
             background: white;
             display: flex;
@@ -43,12 +43,25 @@
         }
 
         .logo {
-            color: var(--primary);
-            font-size: 27px;
-            font-weight: 800;
-            letter-spacing: -1px;
-        }
+    color: var(--primary);
+    font-size: 27px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.2;
+}
 
+.brand {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.brand-tagline {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+}
         .header-link {
             color: var(--primary);
             text-decoration: none;
@@ -276,10 +289,20 @@
         }
 
         @media (max-width: 760px) {
-            header {
-                height: 66px;
-                padding: 0 22px;
-            }
+           header {
+    min-height: 80px;
+    padding: 10px 22px;
+    gap: 12px;
+}
+
+.brand-tagline {
+    max-width: 240px;
+    font-size: 10px;
+}
+
+.logo {
+    font-size: 24px;
+}
 
             .logo {
                 font-size: 24px;
@@ -334,10 +357,17 @@
 <body>
 
 <header>
-    <div class="logo">SkillSync.</div>
-    <a href="login.html" class="header-link">Already a member? Login</a>
-</header>
+    <div class="brand">
+        <div class="logo">SkillSync</div>
+        <div class="brand-tagline">
+            A Student Skill Exchange &amp; Peer Learning Platform
+        </div>
+    </div>
 
+    <a href="login.html" class="header-link">
+        Already a member? Login
+    </a>
+</header>
 <main>
     <div class="register-wrapper">
 

@@ -19,7 +19,7 @@
         }
 
         header {
-            height: 68px;
+            min-height: 80px;
             background: white;
             border-bottom: 1px solid #e2e8f0;
             display: flex;
@@ -32,10 +32,24 @@
         }
 
         .logo {
-            color: #4f46e5;
-            font-size: 26px;
-            font-weight: bold;
-        }
+    font-size: 27px;
+    font-weight: bold;
+    color: #4f46e5;
+    line-height: 1.2;
+}
+
+.brand {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.brand-tagline {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.4;
+}
 
         .header-logout {
             border: none;
@@ -503,8 +517,16 @@
 <body>
 
 <header>
-    <div class="logo">SkillSync.</div>
-    <button class="header-logout" id="headerLogoutButton">Log Out</button>
+    <div class="brand">
+        <div class="logo">SkillSync</div>
+        <div class="brand-tagline">
+            A Student Skill Exchange &amp; Peer Learning Platform
+        </div>
+    </div>
+
+    <button class="header-logout" id="headerLogoutButton" type="button">
+        Log Out
+    </button>
 </header>
 
 <div class="dashboard-layout">
