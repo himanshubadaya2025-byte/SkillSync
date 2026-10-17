@@ -55,104 +55,123 @@ app.post("/api/register", async (req, res) => {
 
     try {
         const hashedPassword = await require("bcrypt").hash(password, 10);
+// Start a database transaction using a dedicated connection
+db.getConnection((connectionErr, connection) => {
+    if (connectionErr) {
+        console.error("Database connection error:", connectionErr.message);
 
-        // Start a database transaction
-        db.beginTransaction((transactionErr) => {
-            if (transactionErr) {
-                console.error("Transaction error:", transactionErr.message);
+        return res.status(500).json({
+            message: "Registration failed. Please try again."
+        });
+    }
 
-                return res.status(500).json({
-                    message: "Registration failed. Please try again."
-                });
-            }
+    connection.beginTransaction((transactionErr) => {
+        if (transactionErr) {
+            console.error("Transaction error:", transactionErr.message);
+            connection.release();
 
-            // Create the student with 2 starter credits
-            const sql = `
-                INSERT INTO students
-                    (full_name, email, password, department, skill_credits)
-                VALUES (?, ?, ?, ?, 2)
-            `;
+            return res.status(500).json({
+                message: "Registration failed. Please try again."
+            });
+        }
 
-            db.query(
-                sql,
-                [
-                    fullName.trim(),
-                    email.trim().toLowerCase(),
-                    hashedPassword,
-                    department
-                ],
-                (err, result) => {
-                    if (err) {
-                        return db.rollback(() => {
-                            if (err.code === "ER_DUP_ENTRY") {
-                                return res.status(409).json({
-                                    message: "This email is already registered."
-                                });
-                            }
+        // Create the student with 2 starter credits
+        const sql = `
+            INSERT INTO students
+                (full_name, email, password, department, skill_credits)
+            VALUES (?, ?, ?, ?, 2)
+        `;
 
-                            console.error("Registration error:", err.message);
+        connection.query(
+            sql,
+            [
+                fullName.trim(),
+                email.trim().toLowerCase(),
+                hashedPassword,
+                department
+            ],
+            (err, result) => {
+                if (err) {
+                    return connection.rollback(() => {
+                        connection.release();
 
-                            return res.status(500).json({
-                                message: "Registration failed. Please try again."
+                        if (err.code === "ER_DUP_ENTRY") {
+                            return res.status(409).json({
+                                message: "This email is already registered."
                             });
+                        }
+
+                        console.error("Registration error:", err.message);
+
+                        return res.status(500).json({
+                            message: "Registration failed. Please try again."
                         });
-                    }
+                    });
+                }
 
-                    const studentId = result.insertId;
+                const studentId = result.insertId;
 
-                    // Record the starter credits
-                    const transactionSql = `
-                        INSERT INTO credit_transactions
-                            (student_id, amount, transaction_type, description)
-                        VALUES (?, 2, 'Starter', ?)
-                    `;
+                // Record the starter credits
+                const transactionSql = `
+                    INSERT INTO credit_transactions
+                        (student_id, amount, transaction_type, description)
+                    VALUES (?, 2, 'Starter', ?)
+                `;
 
-                    db.query(
-                        transactionSql,
-                        [
-                            studentId,
-                            "2 starter Skill Credits awarded at registration"
-                        ],
-                        (transactionInsertErr) => {
-                            if (transactionInsertErr) {
+                connection.query(
+                    transactionSql,
+                    [
+                        studentId,
+                        "2 starter Skill Credits awarded at registration"
+                    ],
+                    (transactionInsertErr) => {
+                        if (transactionInsertErr) {
+                            console.error(
+                                "Starter credit recording error:",
+                                transactionInsertErr.message
+                            );
+
+                            return connection.rollback(() => {
+                                connection.release();
+
+                                return res.status(500).json({
+                                    message: "Registration failed. Please try again."
+                                });
+                            });
+                        }
+
+                        // Save both changes together
+                        connection.commit((commitErr) => {
+                            if (commitErr) {
                                 console.error(
-                                    "Starter credit recording error:",
-                                    transactionInsertErr.message
+                                    "Registration commit error:",
+                                    commitErr.message
                                 );
 
-                                return db.rollback(() => {
+                                return connection.rollback(() => {
+                                    connection.release();
+
                                     return res.status(500).json({
                                         message: "Registration failed. Please try again."
                                     });
                                 });
                             }
 
-                            // Save both changes together
-                            db.commit((commitErr) => {
-                                if (commitErr) {
-                                    return db.rollback(() => {
-                                        console.error(
-                                            "Registration commit error:",
-                                            commitErr.message
-                                        );
+                            // Return the connection to the pool
+                            connection.release();
 
-                                        return res.status(500).json({
-                                            message: "Registration failed. Please try again."
-                                        });
-                                    });
-                                }
-
-                                return res.status(201).json({
-                                    message: "Account created successfully! You received 2 starter Skill Credits.",
-                                    studentId: studentId,
-                                    skillCredits: 2
-                                });
+                            return res.status(201).json({
+                                message: "Account created successfully! You received 2 starter Skill Credits.",
+                                studentId: studentId,
+                                skillCredits: 2
                             });
-                        }
-                    );
-                }
-            );
-        });
+                        });
+                    }
+                );
+            }
+        );
+    });
+});
     } catch (err) {
         console.error("Password hashing error:", err.message);
 
@@ -1141,18 +1160,35 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
         return;
     }
 
-    // Completing an accepted exchange and transferring credits
-    db.beginTransaction((err) => {
+// Completing an accepted exchange and transferring credits
+db.getConnection((connectionErr, connection) => {
+    if (connectionErr) {
+        console.error("Database connection error:", connectionErr.message);
+
+        return res.status(500).json({
+            message: "Unable to connect to the database."
+        });
+    }
+
+    connection.beginTransaction((err) => {
         if (err) {
             console.error("Transaction start error:", err.message);
+            connection.release();
 
             return res.status(500).json({
                 message: "Unable to start the credit transaction."
             });
         }
 
+        let transactionFinished = false;
+
         const rollback = (statusCode, message) => {
-            db.rollback(() => {
+            if (transactionFinished) return;
+
+            transactionFinished = true;
+
+            connection.rollback(() => {
+                connection.release();
                 return res.status(statusCode).json({ message });
             });
         };
@@ -1165,7 +1201,7 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
             FOR UPDATE
         `;
 
-        db.query(requestSql, [requestId], (err, requests) => {
+        connection.query(requestSql, [requestId], (err, requests) => {
             if (err) {
                 console.error("Request lookup error:", err.message);
                 return rollback(500, "Unable to check the exchange request.");
@@ -1177,7 +1213,7 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
 
             const request = requests[0];
 
-            if (request.requester_id !== studentId) {
+            if (Number(request.requester_id) !== Number(studentId)) {
                 return rollback(
                     403,
                     "Only the student who requested the skill can mark this exchange as completed."
@@ -1200,7 +1236,7 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                 FOR UPDATE
             `;
 
-            db.query(
+            connection.query(
                 balanceSql,
                 [request.requester_id, request.receiver_id],
                 (err, students) => {
@@ -1210,11 +1246,11 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                     }
 
                     const learner = students.find(
-                        s => s.student_id === request.requester_id
+                        s => Number(s.student_id) === Number(request.requester_id)
                     );
 
                     const teacher = students.find(
-                        s => s.student_id === request.receiver_id
+                        s => Number(s.student_id) === Number(request.receiver_id)
                     );
 
                     if (!learner || !teacher) {
@@ -1229,7 +1265,7 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                     }
 
                     // Deduct one credit from the learner
-                    db.query(
+                    connection.query(
                         `UPDATE students
                          SET skill_credits = skill_credits - 1
                          WHERE student_id = ? AND skill_credits >= 1`,
@@ -1237,18 +1273,18 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                         (err, result) => {
                             if (err) {
                                 console.error("Credit deduction error:", err.message);
-                                return rollback(500, "Unable to deduct the learner's credit.");
-                            }
-
-                            if (result.affectedRows !== 1) {
                                 return rollback(
-                                    400,
-                                    "Insufficient Skill Credits."
+                                    500,
+                                    "Unable to deduct the learner's credit."
                                 );
                             }
 
+                            if (result.affectedRows !== 1) {
+                                return rollback(400, "Insufficient Skill Credits.");
+                            }
+
                             // Award one credit to the teacher
-                            db.query(
+                            connection.query(
                                 `UPDATE students
                                  SET skill_credits = skill_credits + 1
                                  WHERE student_id = ?`,
@@ -1256,11 +1292,17 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                                 (err, result) => {
                                     if (err) {
                                         console.error("Credit reward error:", err.message);
-                                        return rollback(500, "Unable to reward the teacher.");
+                                        return rollback(
+                                            500,
+                                            "Unable to reward the teacher."
+                                        );
                                     }
 
                                     if (result.affectedRows !== 1) {
-                                        return rollback(500, "Unable to reward the teacher.");
+                                        return rollback(
+                                            500,
+                                            "Unable to reward the teacher."
+                                        );
                                     }
 
                                     // Record both sides of the transfer
@@ -1273,7 +1315,7 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                                             (?, 1, 'Earned', ?, ?)
                                     `;
 
-                                    db.query(
+                                    connection.query(
                                         transactionSql,
                                         [
                                             learner.student_id,
@@ -1285,12 +1327,19 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                                         ],
                                         (err) => {
                                             if (err) {
-                                                console.error("Credit history error:", err.message);
-                                                return rollback(500, "Unable to record credit history.");
+                                                console.error(
+                                                    "Credit history error:",
+                                                    err.message
+                                                );
+
+                                                return rollback(
+                                                    500,
+                                                    "Unable to record credit history."
+                                                );
                                             }
 
                                             // Mark completed in the same transaction
-                                            db.query(
+                                            connection.query(
                                                 `UPDATE exchange_requests
                                                  SET status = 'Completed'
                                                  WHERE request_id = ?
@@ -1298,8 +1347,15 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                                                 [requestId],
                                                 (err, result) => {
                                                     if (err) {
-                                                        console.error("Completion update error:", err.message);
-                                                        return rollback(500, "Unable to complete the exchange.");
+                                                        console.error(
+                                                            "Completion update error:",
+                                                            err.message
+                                                        );
+
+                                                        return rollback(
+                                                            500,
+                                                            "Unable to complete the exchange."
+                                                        );
                                                     }
 
                                                     if (result.affectedRows !== 1) {
@@ -1309,16 +1365,22 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
                                                         );
                                                     }
 
-                                                    db.commit((err) => {
+                                                    // Commit all changes together
+                                                    connection.commit((err) => {
                                                         if (err) {
-                                                            console.error("Commit error:", err.message);
+                                                            console.error(
+                                                                "Commit error:",
+                                                                err.message
+                                                            );
 
-                                                            return db.rollback(() => {
-                                                                return res.status(500).json({
-                                                                    message: "Unable to save the completed exchange."
-                                                                });
-                                                            });
+                                                            return rollback(
+                                                                500,
+                                                                "Unable to save the completed exchange."
+                                                            );
                                                         }
+
+                                                        transactionFinished = true;
+                                                        connection.release();
 
                                                         return res.json({
                                                             message: "Exchange completed successfully! One Skill Credit was transferred from the learner to the teacher.",
@@ -1338,6 +1400,9 @@ app.patch("/api/exchange-requests/:requestId", (req, res) => {
             );
         });
     });
+});
+
+
 });
 
 
