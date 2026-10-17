@@ -975,54 +975,72 @@
     }
 
     async function updateRequest(
-        requestId,
-        status,
-        clickedButton,
-        otherButton
-    ) {
-        if (clickedButton) clickedButton.disabled = true;
-        if (otherButton) otherButton.disabled = true;
+    requestId,
+    status,
+    clickedButton,
+    otherButton
+) {
+    if (clickedButton) clickedButton.disabled = true;
+    if (otherButton) otherButton.disabled = true;
 
-        showPageMessage("");
+    showPageMessage("");
+
+    try {
+        const response = await fetch(
+            "/api/exchange-requests/" + encodeURIComponent(requestId),
+            {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    studentId: Number(student.studentId),
+                    status: status
+                })
+            }
+        );
+
+        // Read the response as text first so HTML errors
+        // don't cause an unexpected JSON parsing error.
+        const responseText = await response.text();
+
+        let data;
 
         try {
-            const response = await fetch(
-                "/api/exchange-requests/" + encodeURIComponent(requestId),
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        studentId: student.studentId,
-                        status: status
-                    })
-                }
+            data = JSON.parse(responseText);
+        } catch {
+            console.error(
+                "Server returned a non-JSON response:",
+                response.status,
+                responseText
             );
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || "Could not update the request."
-                );
-            }
-
-            showPageMessage(
-                data.message || "Request updated successfully."
+            throw new Error(
+                `Server returned an unexpected response (HTTP ${response.status}). Check the VS Code terminal for the actual error.`
             );
-
-            await loadRequests();
-
-        } catch (error) {
-            console.error("Request update error:", error);
-
-            showPageMessage(error.message, true);
-
-            if (clickedButton) clickedButton.disabled = false;
-            if (otherButton) otherButton.disabled = false;
         }
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || "Could not update the request."
+            );
+        }
+
+        showPageMessage(
+            data.message || "Request updated successfully."
+        );
+
+        await loadRequests();
+
+    } catch (error) {
+        console.error("Request update error:", error);
+
+        showPageMessage(error.message, true);
+
+        if (clickedButton) clickedButton.disabled = false;  
+        if (otherButton) otherButton.disabled = false;
     }
+}
 
     document.getElementById("refreshButton").addEventListener(
         "click",
